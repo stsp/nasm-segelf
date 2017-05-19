@@ -1085,10 +1085,10 @@ print "%%EndComments\n";
 print "%%BeginProlog\n";
 
 # Emit the configurables as PostScript tokens
-foreach $c ( keys(%psconf) ) {
+foreach $c ( sort keys(%psconf) ) {
     print "/$c ", $psconf{$c}, " def\n";
 }
-foreach $c ( keys(%psbool) ) {
+foreach $c ( sort keys(%psbool) ) {
     print "/$c ", ($psbool{$c}?'true':'false'), " def\n";
 }
 
