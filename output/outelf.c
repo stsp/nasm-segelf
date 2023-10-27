@@ -78,6 +78,12 @@ static struct SAA *symtab, *symtab_shndx;
 static struct SAA *strs;
 static uint32_t strslen;
 
+struct glob_sym {
+    struct rbtree rb;
+    char *name;
+};
+static struct rbtree *globs_rbt;
+
 static struct RAA *section_by_index;
 static struct hash_table section_by_name;
 
@@ -977,6 +983,7 @@ static void elf_deflabel(char *name, int32_t segment, int64_t offset,
     if (sym_type_local(sym->type)) {
         nlocals++;
     } else {
+        struct glob_sym *gsym;
         /*
          * If sym->section == SHN_ABS, then the first line of the
          * else section would cause a core dump, because its a reference
@@ -1002,11 +1009,17 @@ static void elf_deflabel(char *name, int32_t segment, int64_t offset,
 
         }
         sym->globnum = nglobs;
+
+        gsym = malloc(sizeof(*gsym));
+        gsym->name = strdup(name);
+        memset(&gsym->rb, 0, sizeof(gsym->rb));
+        gsym->rb.key = nglobs;
+        globs_rbt = rb_insert(globs_rbt, &gsym->rb);
         nglobs++;
     }
 }
 
-static void elf_add_reloc(struct elf_section *sect, int32_t segment,
+static void elf_add_reloc_to(struct elf_section *sect, int32_t idx,
                           int64_t offset, int type)
 {
     struct elf_reloc *r;
@@ -1016,18 +1029,26 @@ static void elf_add_reloc(struct elf_section *sect, int32_t segment,
 
     r->address = sect->len;
     r->offset = offset;
+    r->symbol = idx;
+    r->type = type;
+
+    sect->nrelocs++;
+}
+
+static void elf_add_reloc(struct elf_section *sect, int32_t segment,
+                          int64_t offset, int type)
+{
+    int idx = 0;
 
     if (segment != NO_SEG) {
         const struct elf_section *s;
         s = raa_read_ptr(section_by_index, segment >> 1);
         if (s)
-            r->symbol = s->shndx + 1;
+            idx = s->shndx + 1;
         else
-            r->symbol = GLOBAL_TEMP_BASE + raa_read(bsym, segment);
+            idx = GLOBAL_TEMP_BASE + raa_read(bsym, segment);
     }
-    r->type = type;
-
-    sect->nrelocs++;
+    elf_add_reloc_to(sect, idx, offset, type);
 }
 
 /*
@@ -1096,6 +1117,49 @@ static int64_t elf_add_gsym_reloc(struct elf_section *sect,
 
     sect->nrelocs++;
     return r->offset;
+}
+
+static int elf_defrelc(const char *op, int arg, int32_t segment)
+{
+    int pos = strslen;
+    struct elf_symbol *sym;
+    struct glob_sym *gsym;
+    const struct elf_section *s;
+    struct rbtree *rb;
+    char *name;
+    int len, symlen, idx;
+
+    s = raa_read_ptr(section_by_index, segment >> 1);
+    if (s)
+        idx = s->shndx + 1;
+    else
+        idx = raa_read(bsym, segment);
+    rb = rb_search(globs_rbt, idx);
+    nasm_assert(rb);
+    gsym = container_of(rb, struct glob_sym, rb);
+    symlen = strlen(gsym->name);
+    len = symlen + 128;
+    name = malloc(len);
+    if (arg)
+        snprintf(name, len, "%s:s%i:%s:#%08x", op, symlen, gsym->name, arg);
+    else
+        snprintf(name, len, "%s:s%i:%s", op, symlen, gsym->name);
+    saa_wbytes(strs, name, (int32_t)(1 + strlen(name)));
+    strslen += 1 + strlen(name);
+    free(name);
+
+    sym = saa_wstruct(syms);
+
+    memset(&sym->symv, 0, sizeof(struct rbtree));
+
+    sym->strpos = pos;
+    sym->other = STV_DEFAULT;
+    sym->size = 0;
+    sym->section = XSHN_UNDEF;
+    /* Note: ELF32_ST_INFO() and ELF64_ST_INFO() are identical */
+    sym->type = ELF32_ST_INFO(STB_GLOBAL, STT_RELC);
+    sym->globnum = nglobs;
+    return GLOBAL_TEMP_BASE + nglobs++;
 }
 
 static void elf32_out(int32_t segto, const void *data,
@@ -1168,7 +1232,8 @@ static void elf32_out(int32_t segto, const void *data,
                 if (asize < 2) {
                     nasm_nonfatal("invalid segment base reference");
                 } else {
-                    elf_add_reloc(s, segment & ~1, 0, R_386_SEG16);
+                    int idx = elf_defrelc(">>", 4, segment & ~1);
+                    elf_add_reloc_to(s, idx, 0, R_386_16);
                     gnu16 = "segment";
                 }
             } else {
@@ -1234,14 +1299,17 @@ static void elf32_out(int32_t segto, const void *data,
                     case 2:
                         gnu16 = "16-bit";
                         elf_add_reloc(s, segment, 0, R_386_16);
-                        if (wrt != NO_SEG)
-                            elf_add_reloc(s, wrt & ~1, 0, R_386_SUB16);
+                        if (wrt != NO_SEG) {
+                            int idx = elf_defrelc("-", 0, wrt & ~1);
+                            elf_add_reloc_to(s, idx, 0, R_386_16);
+                        }
                         break;
                     case 4:
                         elf_add_reloc(s, segment, 0, R_386_32);
                         if (wrt != NO_SEG) {
+                            int idx = elf_defrelc("-", 0, wrt & ~1);
                             gnu16 = "segment";
-                            elf_add_reloc(s, wrt & ~1, 0, R_386_SUB32);
+                            elf_add_reloc_to(s, idx, 0, R_386_32);
                         }
                         break;
                     default: /* Error issued further down */
