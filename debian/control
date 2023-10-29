@@ -4,7 +4,6 @@ Priority: optional
 Maintainer: stsp <stsp2@yandex.ru>
 Standards-Version: 4.6.1.0
 Build-Depends:
- debhelper-compat,
  dpkg-dev (>= 1.16.1~),
  fonts-liberation2,
  fontconfig,
