@@ -1,0 +1,71 @@
+Upstream sources of nasm were obtained from
+<ftp://ftp.kernel.org/pub/software/devel/nasm/> and
+<http://nasm.2y.net/>.
+Newer sources are downloaded from
+<http://www.nasm.us/>
+
+nasm-0.99.06-20071101.tar.gz was downloded as
+nasm_0.99.06.orig.tar.gz from
+ftp://ftp.zytor.com/pub/nasm/snapshots/20071101/nasm-0.99.06-20071101.tar.gz
+
+The original authors are Julian Hall <jules@earthcorp.com> and Simon
+Tatham <anakin@pobox.com>.
+
+nasm was packaged for Debian by Vincent Renardias <vincent@debian.org>,
+and subsequently maintained by Matej Vela <vela@debian.org> and later
+by Ivo Timmermans <ivo@debian.org>.
+
+Christian Kesselheim <ckesselh@debian.org> was the previous maintainer
+of this package. It's currently maintained by
+Anibal Monsalve Salazar <anibal@debian.org>
+
+Copyright Notices
+
+  copyright (C) 1996 Simon Tatham and Julian Hall
+  Copyright (C) 1999 by Andrew Zabolotny
+  Copyright (C) 1991-1998 SciTech Software, Inc.
+  Copyright 1996-2010 The NASM Authors
+  Copyright 1998-2003, O'Reilly & Associates
+  Copyright (c) 1996,99 Julian Hall. All rights reserved.
+  Copyright (c) 2002 RET & COM Research.
+  Copyright (C) 1998-2000 by DooM Legacy Team.
+  copyright (C) 1998 John S. Fine
+
+  NASM is now licensed under the 2-clause BSD license, also known as the
+  simplified BSD license.
+
+  Copyright 1996-2010 the NASM Authors - All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following
+  conditions are met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+  CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The Debian packaging is copyright (C) 1996-1999 Vincent Renardias, (C)
+1999-2001 Matej Vela, (C) 2001 Ivo Timmermans, (C) 2002 Christian
+Kesselheim, (C) 2016 Anibal Monsalve Salazar and also released under
+the terms of the GNU General Public License; version 2, or any later
+version.
+
+On Debian systems, the complete text of the GNU General Public License
+can be found in /usr/share/common-licenses/GPL-2.
