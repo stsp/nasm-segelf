@@ -13,6 +13,7 @@ Build-Depends:
  libsort-versions-perl,
  texinfo,
  asciidoc-base,
+ xmlto,
 Homepage: https://github.com/stsp/nasm/tree/elf16
 
 Package: nasm-segelf
