@@ -1,0 +1,67 @@
+Summary: The Netwide Assembler nasm with segelf patches
+Name: nasm-segelf
+Provides: nasm
+Obsoletes: nasm
+Conflicts: nasm
+Version: {{{ git_dir_version }}}
+Release: 0%{?dist}
+VCS: {{{ git_dir_vcs }}}
+License: BSD
+Source0: {{{ git_dir_archive }}}
+URL: https://github.com/stsp/nasm
+BuildRoot: /tmp/rpm-build-nasm
+Prefix: %{_prefix}
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: asciidoc
+BuildRequires: xmlto
+BuildRequires: xz
+BuildRequires: perl
+BuildRequires: perl-Font-TTF
+BuildRequires: perl-Sort-Versions
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+%package doc
+Summary: Detailed manual for the Netwide Assembler
+BuildArch: noarch
+BuildRequires: ghostscript
+BuildRequires: fontconfig
+BuildRequires: adobe-source-sans-pro-fonts
+BuildRequires: adobe-source-code-pro-fonts
+
+%description
+NASM is the Netwide Assembler, a free portable assembler for the Intel
+80x86 microprocessor series, using primarily the traditional Intel
+instruction mnemonics and syntax.
+
+%description doc
+Extensive documentation for the Netwide Assembler (NASM) in HTML and
+PDF formats.
+
+%prep
+{{{ git_dir_setup_macro }}}
+
+%build
+sh autogen.sh
+%configure --enable-sections
+make %{?_smp_mflags} everything
+
+%install
+rm -rf "%{buildroot}"
+mkdir -p "%{buildroot}"/%{_bindir}
+mkdir -p "%{buildroot}"/%{_mandir}/man1
+make DESTDIR="%{buildroot}" install
+
+%files
+%doc AUTHORS
+%{_bindir}/nasm
+%{_bindir}/ndisasm
+%{_mandir}/man1/nasm.1*
+%{_mandir}/man1/ndisasm.1*
+
+%files doc
+%doc doc/html doc/nasmdoc.pdf.xz
+
+# This is the upstream spec file; the change log is in git
+%changelog
+{{{ git_dir_changelog }}}
