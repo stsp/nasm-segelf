@@ -1010,8 +1010,8 @@ static void elf_deflabel(char *name, int32_t segment, int64_t offset,
         }
         sym->globnum = nglobs;
 
-        gsym = malloc(sizeof(*gsym));
-        gsym->name = strdup(name);
+        gsym = nasm_malloc(sizeof(*gsym));
+        gsym->name = nasm_strdup(name);
         memset(&gsym->rb, 0, sizeof(gsym->rb));
         gsym->rb.key = nglobs;
         globs_rbt = rb_insert(globs_rbt, &gsym->rb);
@@ -1139,14 +1139,14 @@ static int elf_defrelc(const char *op, int arg, int32_t segment)
     gsym = container_of(rb, struct glob_sym, rb);
     symlen = strlen(gsym->name);
     len = symlen + 128;
-    name = malloc(len);
+    name = nasm_malloc(len);
     if (arg)
         snprintf(name, len, "%s:s%i:%s:#%08x", op, symlen, gsym->name, arg);
     else
         snprintf(name, len, "%s:s%i:%s", op, symlen, gsym->name);
     saa_wbytes(strs, name, (int32_t)(1 + strlen(name)));
     strslen += 1 + strlen(name);
-    free(name);
+    nasm_free(name);
 
     sym = saa_wstruct(syms);
 
