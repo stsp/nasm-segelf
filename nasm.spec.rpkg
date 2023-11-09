@@ -55,6 +55,7 @@ make DESTDIR="%{buildroot}" install
 %files
 %doc AUTHORS
 %{_bindir}/nasm
+%{_bindir}/nasm-segelf
 %{_bindir}/ndisasm
 %{_mandir}/man1/nasm.1*
 %{_mandir}/man1/ndisasm.1*
