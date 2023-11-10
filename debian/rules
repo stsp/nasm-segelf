@@ -16,8 +16,6 @@ override_dh_autoreconf:
 
 override_dh_auto_build:
 	dh_auto_build
-	$(MAKE) doc
-	$(MAKE) manpages
 
 # empty override, fills example directory with lots of files
 override_dh_auto_test:

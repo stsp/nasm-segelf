@@ -102,8 +102,8 @@ endif
 NASM    = asm/nasm.$(O)
 NDISASM = disasm/ndisasm.$(O)
 
-PROGOBJ = $(NASM) $(NDISASM)
-PROGS   = nasm$(X) ndisasm$(X)
+PROGOBJ = $(NASM)
+PROGS   = nasm-segelf$(X)
 
 LIBOBJ_NW = stdlib/snprintf.$(O) stdlib/vsnprintf.$(O) stdlib/strlcpy.$(O) \
 	stdlib/strnlen.$(O) stdlib/strrchrnul.$(O) \
@@ -176,11 +176,11 @@ $(NASMLIB): $(LIBOBJ)
 	$(AR) cq $(NASMLIB) $(LIBOBJ)
 	$(RANLIB) $(NASMLIB)
 
-nasm$(X): $(NASM) $(NASMLIB)
-	$(CC) $(ALL_LDFLAGS) -o nasm$(X) $(NASM) $(NASMLIB) $(LIBS)
+nasm-segelf$(X): $(NASM) $(NASMLIB)
+	$(CC) $(ALL_LDFLAGS) -o $@ $(NASM) $(NASMLIB) $(LIBS)
 
 ndisasm$(X): $(NDISASM) $(NASMLIB)
-	$(CC) $(ALL_LDFLAGS) -o ndisasm$(X) $(NDISASM) $(NASMLIB) $(LIBS)
+	$(CC) $(ALL_LDFLAGS) -o $@ $(NDISASM) $(NASMLIB) $(LIBS)
 
 #-- Begin Generated File Rules --#
 
@@ -367,10 +367,6 @@ manpages: nasm.1 ndisasm.1
 install: $(PROGS)
 	$(MKDIR_P) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(PROGS) $(DESTDIR)$(bindir)/
-	$(LN_S) nasm $(DESTDIR)$(bindir)/nasm-segelf
-	$(MKDIR_P) $(DESTDIR)$(mandir)/man1
-	$(INSTALL_DATA) $(srcdir)/nasm.1 $(DESTDIR)$(mandir)/man1/nasm.1
-	$(INSTALL_DATA) $(srcdir)/ndisasm.1 $(DESTDIR)$(mandir)/man1/ndisasm.1
 
 clean:
 	for d in . $(SUBDIRS) $(XSUBDIRS); do \
@@ -539,6 +535,13 @@ cleandeps: $(PERLREQ) $(tools)/syncfiles.pl $(tools)/mkdep.pl
 	if [ -f config.status ]; then \
 		sh config.status; \
 	fi
+
+deb: debian
+	debuild -i -us -uc -b
+
+rpm: nasm.spec.rpkg
+	git clean -fd
+	rpkg local
 
 #-- Magic hints to mkdep.pl --#
 # @object-ending: ".$(O)"
