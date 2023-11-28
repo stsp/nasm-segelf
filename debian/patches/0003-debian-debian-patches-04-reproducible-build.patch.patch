@@ -18,9 +18,9 @@ index 76c70f6..7914477 100644
  
  static void show_version(void)
  {
--    printf("nasm-segelf version %s compiled on %s%s\n",
+-    printf("NASM version %s (segelf) compiled on %s%s\n",
 -           nasm_version, nasm_date, nasm_compile_options);
-+    printf("nasm-segelf version %s%s\n",
++    printf("NASM version %s (segelf) %s\n",
 +           nasm_version, nasm_compile_options);
      exit(0);
  }

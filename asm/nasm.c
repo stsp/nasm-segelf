@@ -977,7 +977,7 @@ static const struct textargs textopts[] = {
 
 static void show_version(void)
 {
-    printf("nasm-segelf version %s compiled on %s%s\n",
+    printf("NASM version %s (segelf) compiled on %s%s\n",
            nasm_version, nasm_date, nasm_compile_options);
     exit(0);
 }
