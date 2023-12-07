@@ -108,6 +108,7 @@ sub alldeps($$) {
 # This almost certainly works only on relative filenames...
 sub convert_file($$) {
     my($file,$sep) = @_;
+    my $s = substr($file,0,1);
 
     my @fspec = (basename($file));
     while ( ($file = dirname($file)) ne File::Spec->curdir() &&
@@ -121,7 +122,11 @@ sub convert_file($$) {
 	# like OpenWatcom WMAKE.
 	return $fspec[scalar(@fspec)-1];
     } else {
-	return join($sep, @fspec);
+	my $ret = join($sep, @fspec);
+	if ( $s eq '/' ) {
+	    return $s . $ret;
+	}
+	return $ret;
     }
 }
 
