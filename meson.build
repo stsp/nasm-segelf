@@ -14,3 +14,4 @@ run_command(
   check: true
 )
 NASM_SEGELF = find_program(meson.current_build_dir() / 'build/nasm-segelf')
+meson.override_find_program('nasm-segelf', NASM_SEGELF)
