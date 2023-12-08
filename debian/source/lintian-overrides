@@ -1,0 +1,4 @@
+nasm source: source-is-missing [travis/test/*.o.t]
+nasm source: source-contains-prebuilt-windows-binary [travis/test/*.bin.t]
+nasm source: source-contains-prebuilt-windows-binary [travis/test/*.exe.t]
+nasm source: source-contains-prebuilt-binary [travis/test/*.o.t]

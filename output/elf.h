@@ -261,7 +261,8 @@
 #define STT_FILE	4	/* Symbol's name is file name */
 #define STT_COMMON	5	/* Symbol is a common data object */
 #define STT_TLS		6	/* Symbol is thread-local data object */
-#define STT_NUM		7	/* Number of defined types */
+#define STT_RELC	8		/* Complex relocation expression */
+#define STT_SRELC	9		/* Signed Complex relocation expression */
 
 /* Symbol visibilities */
 #define STV_DEFAULT	0	/* Default symbol visibility rules */
@@ -362,10 +363,7 @@ enum reloc32_type {
 	R_386_16		= 20,	/* A 16-bit absolute relocation */
 	R_386_PC16		= 21,	/* A 16-bit PC-relative relocation */
 	R_386_8			= 22,	/* An 8-bit absolute relocation */
-	R_386_PC8		= 23,	/* An 8-bit PC-relative relocation */
-        R_386_SEG16		= 45,   /* A 16-bit real-mode segment */
-        R_386_SUB16		= 46,   /* Subtract 16-bit value */
-        R_386_SUB32		= 47    /* Subtract 32-bit value */
+	R_386_PC8		= 23	/* An 8-bit PC-relative relocation */
 };
 
 #define ELF64_R_SYM(x)		((x) >> 32)

@@ -11,7 +11,11 @@
 top_srcdir	= @top_srcdir@
 srcdir		= @srcdir@
 objdir		= @builddir@
-VPATH		= @srcdir@
+vpath		%.c @srcdir@
+vpath		%.in @srcdir@
+vpath		%.ph @srcdir@
+vpath		%.pl @srcdir@
+vpath		%.dat @srcdir@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 bindir		= @bindir@
@@ -40,7 +44,7 @@ STRIP		= @STRIP@
 tools		= $(top_srcdir)/tools
 
 PERL		= perl
-PERLFLAGS	= -I$(top_srcdir)/perllib -I$(srcdir)
+PERLFLAGS	= -I$(top_srcdir)/perllib -I$(srcdir) -I.
 RUNPERL         = $(PERL) $(PERLFLAGS)
 
 PYTHON3		= python3
@@ -81,7 +85,7 @@ endif
 
 .PHONY: all doc install clean distclean cleaner spotless test
 .PHONY: install_doc everything install_everything strip perlreq dist tags TAGS
-.PHONY: nothing manpages nsis
+.PHONY: nothing manpages
 
 .c.$(O):
 	$(CC) -c $(ALL_CFLAGS) -o $@ $<
@@ -102,8 +106,8 @@ endif
 NASM    = asm/nasm.$(O)
 NDISASM = disasm/ndisasm.$(O)
 
-PROGOBJ = $(NASM) $(NDISASM)
-PROGS   = nasm$(X) ndisasm$(X)
+PROGOBJ = $(NASM)
+PROGS   = nasm-segelf$(X)
 
 LIBOBJ_NW = stdlib/snprintf.$(O) stdlib/vsnprintf.$(O) stdlib/strlcpy.$(O) \
 	stdlib/strnlen.$(O) stdlib/strrchrnul.$(O) \
@@ -169,18 +173,20 @@ all: dirs
 NASMLIB = libnasm.$(A)
 
 dirs:
-	$(MKDIR_P) $(SUBDIRS) $(XSUBDIRS)
+	$(MKDIR_P) $(SUBDIRS) $(XSUBDIRS) include
+$(SUBDIRS) include misc nsis:
+	$(MKDIR_P) $@
 
 $(NASMLIB): $(LIBOBJ)
 	$(RM_F) $(NASMLIB)
 	$(AR) cq $(NASMLIB) $(LIBOBJ)
 	$(RANLIB) $(NASMLIB)
 
-nasm$(X): $(NASM) $(NASMLIB)
-	$(CC) $(ALL_LDFLAGS) -o nasm$(X) $(NASM) $(NASMLIB) $(LIBS)
+nasm-segelf$(X): $(NASM) $(NASMLIB)
+	$(CC) $(ALL_LDFLAGS) -o $@ $(NASM) $(NASMLIB) $(LIBS)
 
 ndisasm$(X): $(NDISASM) $(NASMLIB)
-	$(CC) $(ALL_LDFLAGS) -o ndisasm$(X) $(NDISASM) $(NASMLIB) $(LIBS)
+	$(CC) $(ALL_LDFLAGS) -o $@ $(NDISASM) $(NASMLIB) $(LIBS)
 
 #-- Begin Generated File Rules --#
 
@@ -206,67 +212,67 @@ config/unconfig.h: config/config.h.in
 	$(RUNPERL) $(tools)/unconfig.pl \
 		'$(srcdir)' config/config.h.in config/unconfig.h
 
-x86/iflag.c: $(INSDEP)
+x86/iflag.c: $(INSDEP) | x86
 	$(RUNPERL) $(srcdir)/x86/insns.pl -fc \
 		$(srcdir)/x86/insns.dat x86/iflag.c
-x86/iflaggen.h: $(INSDEP)
+x86/iflaggen.h: $(INSDEP) | x86
 	$(RUNPERL) $(srcdir)/x86/insns.pl -fh \
 		$(srcdir)/x86/insns.dat x86/iflaggen.h
-x86/insnsb.c: $(INSDEP)
+x86/insnsb.c: $(INSDEP) | x86
 	$(RUNPERL) $(srcdir)/x86/insns.pl -b \
 		$(srcdir)/x86/insns.dat x86/insnsb.c
-x86/insnsa.c: $(INSDEP)
+x86/insnsa.c: $(INSDEP) | x86
 	$(RUNPERL) $(srcdir)/x86/insns.pl -a \
 		$(srcdir)/x86/insns.dat x86/insnsa.c
-x86/insnsd.c: $(INSDEP)
+x86/insnsd.c: $(INSDEP) | x86
 	$(RUNPERL) $(srcdir)/x86/insns.pl -d \
 		$(srcdir)/x86/insns.dat x86/insnsd.c
-x86/insnsi.h: $(INSDEP)
+x86/insnsi.h: $(INSDEP) | x86
 	$(RUNPERL) $(srcdir)/x86/insns.pl -i \
 		$(srcdir)/x86/insns.dat x86/insnsi.h
-x86/insnsn.c: $(INSDEP)
+x86/insnsn.c: $(INSDEP) | x86
 	$(RUNPERL) $(srcdir)/x86/insns.pl -n \
 		$(srcdir)/x86/insns.dat x86/insnsn.c
 
 # These files contains all the standard macros that are derived from
 # the version number.
-version.h: version version.pl
+version.h: $(srcdir)/version $(srcdir)/version.pl
 	$(RUNPERL) $(srcdir)/version.pl h < $(srcdir)/version > version.h
-version.mac: version version.pl
+version.mac: $(srcdir)/version $(srcdir)/version.pl
 	$(RUNPERL) $(srcdir)/version.pl mac < $(srcdir)/version > version.mac
-version.sed: version version.pl
+version.sed: $(srcdir)/version $(srcdir)/version.pl
 	$(RUNPERL) $(srcdir)/version.pl sed < $(srcdir)/version > version.sed
-version.mak: version version.pl
+version.mak: $(srcdir)/version $(srcdir)/version.pl
 	$(RUNPERL) $(srcdir)/version.pl make < $(srcdir)/version > version.mak
-nsis/version.nsh: version version.pl
+nsis/version.nsh: $(srcdir)/version $(srcdir)/version.pl | nsis
 	$(RUNPERL) $(srcdir)/version.pl nsis < $(srcdir)/version > nsis/version.nsh
 
 # This source file is generated from the standard macros file
 # `standard.mac' by another Perl script. Again, it's part of the
 # standard distribution.
 macros/macros.c: macros/macros.pl asm/pptok.ph version.mac \
-	$(srcdir)/macros/*.mac $(srcdir)/output/*.mac
+	$(srcdir)/macros/*.mac $(srcdir)/output/*.mac | macros
 	$(RUNPERL) $(srcdir)/macros/macros.pl version.mac \
 		$(srcdir)/macros/*.mac $(srcdir)/output/*.mac
 
 # These source files are generated from regs.dat by yet another
 # perl script.
-x86/regs.c: x86/regs.dat x86/regs.pl
+x86/regs.c: x86/regs.dat x86/regs.pl | x86
 	$(RUNPERL) $(srcdir)/x86/regs.pl c \
 		$(srcdir)/x86/regs.dat > x86/regs.c
-x86/regflags.c: x86/regs.dat x86/regs.pl
+x86/regflags.c: x86/regs.dat x86/regs.pl | x86
 	$(RUNPERL) $(srcdir)/x86/regs.pl fc \
 		$(srcdir)/x86/regs.dat > x86/regflags.c
-x86/regdis.c: x86/regs.dat x86/regs.pl
+x86/regdis.c: x86/regs.dat x86/regs.pl | x86
 	$(RUNPERL) $(srcdir)/x86/regs.pl dc \
 		$(srcdir)/x86/regs.dat > x86/regdis.c
-x86/regdis.h: x86/regs.dat x86/regs.pl
+x86/regdis.h: x86/regs.dat x86/regs.pl | x86
 	$(RUNPERL) $(srcdir)/x86/regs.pl dh \
 		$(srcdir)/x86/regs.dat > x86/regdis.h
-x86/regvals.c: x86/regs.dat x86/regs.pl
+x86/regvals.c: x86/regs.dat x86/regs.pl | x86
 	$(RUNPERL) $(srcdir)/x86/regs.pl vc \
 		$(srcdir)/x86/regs.dat > x86/regvals.c
-x86/regs.h: x86/regs.dat x86/regs.pl
+x86/regs.h: x86/regs.dat x86/regs.pl | x86
 	$(RUNPERL) $(srcdir)/x86/regs.pl h \
 		$(srcdir)/x86/regs.dat > x86/regs.h
 
@@ -281,67 +287,67 @@ warnings:
 	$(RM_F) $(WARNFILES) $(WARNFILES:=.time)
 	$(MAKE) asm/warnings.time
 
-asm/warnings.time: $(ALLOBJ_NW:.$(O)=.c)
+asm/warnings.time: $(ALLOBJ_NW:.$(O)=.c) | asm
 	: > asm/warnings.time
 	$(MAKE) $(WARNFILES:=.time)
 
-asm/warnings_c.h.time: asm/warnings.pl asm/warnings.time
+asm/warnings_c.h.time: asm/warnings.pl asm/warnings.time | asm
 	$(RUNPERL) $(srcdir)/asm/warnings.pl c asm/warnings_c.h $(srcdir)
 	: > asm/warnings_c.h.time
 
-asm/warnings_c.h: asm/warnings_c.h.time
-	@: Side effect
+asm/warnings_c.h: asm/warnings_c.h.time | asm
+	touch $@
 
-include/warnings.h.time: asm/warnings.pl asm/warnings.time
+include/warnings.h.time: asm/warnings.pl asm/warnings.time | include
 	$(RUNPERL) $(srcdir)/asm/warnings.pl h include/warnings.h $(srcdir)
 	: > include/warnings.h.time
 
-include/warnings.h: include/warnings.h.time
-	@: Side effect
+include/warnings.h: include/warnings.h.time | include
+	touch $@
 
 doc/warnings.src.time: asm/warnings.pl asm/warnings.time
 	$(RUNPERL) $(srcdir)/asm/warnings.pl doc doc/warnings.src $(srcdir)
 	: > doc/warnings.src.time
 
 doc/warnings.src : doc/warnings.src.time
-	@: Side effect
+	touch $@
 
 # Assembler token hash
 asm/tokhash.c: x86/insns.dat x86/insnsn.c asm/tokens.dat asm/tokhash.pl \
-	perllib/phash.ph
+	perllib/phash.ph | asm
 	$(RUNPERL) $(srcdir)/asm/tokhash.pl c \
 		x86/insnsn.c $(srcdir)/x86/regs.dat \
 		$(srcdir)/asm/tokens.dat > asm/tokhash.c
 
 # Assembler token metadata
 asm/tokens.h: x86/insns.dat x86/insnsn.c asm/tokens.dat asm/tokhash.pl \
-	perllib/phash.ph
+	perllib/phash.ph | asm
 	$(RUNPERL) $(srcdir)/asm/tokhash.pl h \
 		x86/insnsn.c $(srcdir)/x86/regs.dat \
 		$(srcdir)/asm/tokens.dat > asm/tokens.h
 
 # Preprocessor token hash
-asm/pptok.h: asm/pptok.dat asm/pptok.pl perllib/phash.ph
+asm/pptok.h: asm/pptok.dat asm/pptok.pl perllib/phash.ph | asm
 	$(RUNPERL) $(srcdir)/asm/pptok.pl h \
 		$(srcdir)/asm/pptok.dat asm/pptok.h
-asm/pptok.c: asm/pptok.dat asm/pptok.pl perllib/phash.ph
+asm/pptok.c: asm/pptok.dat asm/pptok.pl perllib/phash.ph | asm
 	$(RUNPERL) $(srcdir)/asm/pptok.pl c \
 		$(srcdir)/asm/pptok.dat asm/pptok.c
-asm/pptok.ph: asm/pptok.dat asm/pptok.pl perllib/phash.ph
+asm/pptok.ph: asm/pptok.dat asm/pptok.pl perllib/phash.ph | asm
 	$(RUNPERL) $(srcdir)/asm/pptok.pl ph \
 		$(srcdir)/asm/pptok.dat asm/pptok.ph
 
 # Directives hash
-asm/directiv.h: asm/directiv.dat nasmlib/perfhash.pl perllib/phash.ph
+asm/directiv.h: asm/directiv.dat nasmlib/perfhash.pl perllib/phash.ph | asm
 	$(RUNPERL) $(srcdir)/nasmlib/perfhash.pl h \
 		$(srcdir)/asm/directiv.dat asm/directiv.h
-asm/directbl.c: asm/directiv.dat nasmlib/perfhash.pl perllib/phash.ph
+asm/directbl.c: asm/directiv.dat nasmlib/perfhash.pl perllib/phash.ph | asm
 	$(RUNPERL) $(srcdir)/nasmlib/perfhash.pl c \
 		$(srcdir)/asm/directiv.dat asm/directbl.c
 
 # Emacs token files
 misc/nasmtok.el: misc/emacstbl.pl asm/tokhash.c asm/pptok.c \
-		 asm/directiv.dat version
+		 asm/directiv.dat $(srcdir)/version | misc
 	$(RUNPERL) $< $@ "$(srcdir)" "$(objdir)"
 
 #-- End Generated File Rules --#
@@ -350,14 +356,14 @@ perlreq: $(PERLREQ)
 
 #-- Begin NSIS Rules --#
 
-nsis/arch.nsh: nsis/getpearch.pl nasm$(X)
+nsis/arch.nsh: nsis/getpearch.pl nasm$(X) | nsis
 	$(PERL) $(srcdir)/nsis/getpearch.pl nasm$(X) > nsis/arch.nsh
 
 # Should only be done after "make everything".
 # The use of redirection here keeps makensis from moving the cwd to the
 # source directory.
-nsis: nsis/nasm.nsi nsis/arch.nsh nsis/version.nsh
-	$(MAKENSIS) -Dsrcdir="$(srcdir)" -Dobjdir="$(objdir)" - < nsis/nasm.nsi
+#nsis: nsis/nasm.nsi nsis/arch.nsh nsis/version.nsh
+#	$(MAKENSIS) -Dsrcdir="$(srcdir)" -Dobjdir="$(objdir)" - < nsis/nasm.nsi
 
 #-- End NSIS Rules --#
 
@@ -367,9 +373,6 @@ manpages: nasm.1 ndisasm.1
 install: $(PROGS)
 	$(MKDIR_P) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(PROGS) $(DESTDIR)$(bindir)/
-	$(MKDIR_P) $(DESTDIR)$(mandir)/man1
-	$(INSTALL_DATA) $(srcdir)/nasm.1 $(DESTDIR)$(mandir)/man1/nasm.1
-	$(INSTALL_DATA) $(srcdir)/ndisasm.1 $(DESTDIR)$(mandir)/man1/ndisasm.1
 
 clean:
 	for d in . $(SUBDIRS) $(XSUBDIRS); do \
@@ -509,7 +512,8 @@ EXTERNAL_DEPENDENCIES = 1
 # pollute the git logs.
 #
 Makefile.dep: $(PERLREQ) $(tools)/mkdep.pl config.status
-	$(RUNPERL) $(tools)/mkdep.pl -M Makefile.in -- $(DEPDIRS)
+	$(RUNPERL) $(tools)/mkdep.pl -M $(top_srcdir)/Makefile.in -- \
+  $(addprefix $(top_srcdir)/,$(DEPDIRS))
 
 dep: Makefile.dep
 
@@ -538,6 +542,13 @@ cleandeps: $(PERLREQ) $(tools)/syncfiles.pl $(tools)/mkdep.pl
 	if [ -f config.status ]; then \
 		sh config.status; \
 	fi
+
+deb: debian
+	debuild -i -us -uc -b
+
+rpm: nasm.spec.rpkg
+	git clean -fd
+	rpkg local
 
 #-- Magic hints to mkdep.pl --#
 # @object-ending: ".$(O)"

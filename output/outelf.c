@@ -78,6 +78,12 @@ static struct SAA *symtab, *symtab_shndx;
 static struct SAA *strs;
 static uint32_t strslen;
 
+struct glob_sym {
+    struct rbtree rb;
+    char *name;
+};
+static struct rbtree *globs_rbt;
+
 static struct RAA *section_by_index;
 static struct hash_table section_by_name;
 
@@ -977,6 +983,7 @@ static void elf_deflabel(char *name, int32_t segment, int64_t offset,
     if (sym_type_local(sym->type)) {
         nlocals++;
     } else {
+        struct glob_sym *gsym;
         /*
          * If sym->section == SHN_ABS, then the first line of the
          * else section would cause a core dump, because its a reference
@@ -1002,11 +1009,17 @@ static void elf_deflabel(char *name, int32_t segment, int64_t offset,
 
         }
         sym->globnum = nglobs;
+
+        gsym = nasm_malloc(sizeof(*gsym));
+        gsym->name = nasm_strdup(name);
+        memset(&gsym->rb, 0, sizeof(gsym->rb));
+        gsym->rb.key = nglobs;
+        globs_rbt = rb_insert(globs_rbt, &gsym->rb);
         nglobs++;
     }
 }
 
-static void elf_add_reloc(struct elf_section *sect, int32_t segment,
+static void elf_add_reloc_to(struct elf_section *sect, int32_t idx,
                           int64_t offset, int type)
 {
     struct elf_reloc *r;
@@ -1016,18 +1029,26 @@ static void elf_add_reloc(struct elf_section *sect, int32_t segment,
 
     r->address = sect->len;
     r->offset = offset;
+    r->symbol = idx;
+    r->type = type;
+
+    sect->nrelocs++;
+}
+
+static void elf_add_reloc(struct elf_section *sect, int32_t segment,
+                          int64_t offset, int type)
+{
+    int idx = 0;
 
     if (segment != NO_SEG) {
         const struct elf_section *s;
         s = raa_read_ptr(section_by_index, segment >> 1);
         if (s)
-            r->symbol = s->shndx + 1;
+            idx = s->shndx + 1;
         else
-            r->symbol = GLOBAL_TEMP_BASE + raa_read(bsym, segment);
+            idx = GLOBAL_TEMP_BASE + raa_read(bsym, segment);
     }
-    r->type = type;
-
-    sect->nrelocs++;
+    elf_add_reloc_to(sect, idx, offset, type);
 }
 
 /*
@@ -1098,6 +1119,49 @@ static int64_t elf_add_gsym_reloc(struct elf_section *sect,
     return r->offset;
 }
 
+static int elf_defrelc(const char *op, int arg, int32_t segment)
+{
+    int pos = strslen;
+    struct elf_symbol *sym;
+    struct glob_sym *gsym;
+    const struct elf_section *s;
+    struct rbtree *rb;
+    char *name;
+    int len, symlen, idx;
+
+    s = raa_read_ptr(section_by_index, segment >> 1);
+    if (s)
+        idx = s->shndx + 1;
+    else
+        idx = raa_read(bsym, segment);
+    rb = rb_search(globs_rbt, idx);
+    nasm_assert(rb);
+    gsym = container_of(rb, struct glob_sym, rb);
+    symlen = strlen(gsym->name);
+    len = symlen + 128;
+    name = nasm_malloc(len);
+    if (arg)
+        snprintf(name, len, "%s:s%i:%s:#%08x", op, symlen, gsym->name, arg);
+    else
+        snprintf(name, len, "%s:s%i:%s", op, symlen, gsym->name);
+    saa_wbytes(strs, name, (int32_t)(1 + strlen(name)));
+    strslen += 1 + strlen(name);
+    nasm_free(name);
+
+    sym = saa_wstruct(syms);
+
+    memset(&sym->symv, 0, sizeof(struct rbtree));
+
+    sym->strpos = pos;
+    sym->other = STV_DEFAULT;
+    sym->size = 0;
+    sym->section = XSHN_UNDEF;
+    /* Note: ELF32_ST_INFO() and ELF64_ST_INFO() are identical */
+    sym->type = ELF32_ST_INFO(STB_GLOBAL, STT_RELC);
+    sym->globnum = nglobs;
+    return GLOBAL_TEMP_BASE + nglobs++;
+}
+
 static void elf32_out(int32_t segto, const void *data,
                       enum out_type type, uint64_t size,
                       int32_t segment, int32_t wrt)
@@ -1106,6 +1170,8 @@ static void elf32_out(int32_t segto, const void *data,
     int64_t addr;
     int reltype, bytes;
     static struct symlininfo sinfo;
+    const char *gnu16 = NULL;
+    int badsize = 0;
 
     /*
      * handle absolute-assembly (structure definitions)
@@ -1163,30 +1229,15 @@ static void elf32_out(int32_t segto, const void *data,
         addr = *(int64_t *)data;
         if (segment != NO_SEG) {
             if (segment & 1) {
-                nasm_nonfatal("ELF format does not support"
-                              " segment base references");
+                if (asize < 2) {
+                    nasm_nonfatal("invalid segment base reference");
+                } else {
+                    int idx = elf_defrelc(">>", 4, segment & ~1);
+                    elf_add_reloc_to(s, idx, 0, R_386_16);
+                    gnu16 = "segment";
+                }
             } else {
-                if (wrt == NO_SEG) {
-                    /*
-                     * The if() is a hack to deal with compilers which
-                     * don't handle switch() statements with 64-bit
-                     * expressions.
-                     */
-                    switch (asize) {
-                    case 1:
-                        elf_add_reloc(s, segment, 0, R_386_8);
-                        break;
-                    case 2:
-                        elf_add_reloc(s, segment, 0, R_386_16);
-                        break;
-                    case 4:
-                        elf_add_reloc(s, segment, 0, R_386_32);
-                        break;
-                    default: /* Error issued further down */
-                        err = true;
-                        break;
-                    }
-                } else if (wrt == elf_gotpc_sect + 1) {
+                if (wrt == elf_gotpc_sect + 1) {
                     /*
                      * The user will supply GOT relative to $$. ELF
                      * will let us have GOT relative to $. So we
@@ -1209,10 +1260,12 @@ static void elf32_out(int32_t segto, const void *data,
                 } else if (wrt == elf_sym_sect + 1) {
                     switch (asize) {
                     case 1:
+                        gnu16 = "8-bit";
                         addr = elf_add_gsym_reloc(s, segment, addr, 0,
                                                   R_386_8, false);
                         break;
                     case 2:
+                        gnu16 = "16-bit";
                         addr = elf_add_gsym_reloc(s, segment, addr, 0,
                                                   R_386_16, false);
                         break;
@@ -1228,9 +1281,40 @@ static void elf32_out(int32_t segto, const void *data,
                     nasm_nonfatal("ELF format cannot produce non-PC-"
                                   "relative PLT references");
                 } else {
-                    nasm_nonfatal("ELF format does not support this"
-                                  " use of WRT");
-                    wrt = NO_SEG; /* we can at least _try_ to continue */
+                    if ((wrt != NO_SEG) && (wrt & SEG_ABS)) {
+                        /* Versus a specific absolute segment base */
+                        addr -= (wrt & (SEG_ABS-1)) << 4;
+                        wrt = NO_SEG;
+                    }
+
+                    switch (asize) {
+                    case 1:
+                        gnu16 = "8-bit";
+                        elf_add_reloc(s, segment, 0, R_386_8);
+                        if (wrt != NO_SEG) {
+                            nasm_nonfatal("segment-relative 8-bit pointer "
+                                          "not supported");
+                        }
+                        break;
+                    case 2:
+                        gnu16 = "16-bit";
+                        elf_add_reloc(s, segment, 0, R_386_16);
+                        if (wrt != NO_SEG) {
+                            int idx = elf_defrelc("-", 0, wrt & ~1);
+                            elf_add_reloc_to(s, idx, 0, R_386_16);
+                        }
+                        break;
+                    case 4:
+                        elf_add_reloc(s, segment, 0, R_386_32);
+                        if (wrt != NO_SEG) {
+                            int idx = elf_defrelc("-", 0, wrt & ~1);
+                            gnu16 = "segment";
+                            elf_add_reloc_to(s, idx, 0, R_386_32);
+                        }
+                        break;
+                    default: /* Error issued further down */
+                        break;
+                    }
                 }
             }
         }
@@ -1238,6 +1322,9 @@ static void elf32_out(int32_t segto, const void *data,
         if (err) {
             nasm_nonfatal("Unsupported %d-bit ELF relocation", asize << 3);
         }
+        if (!gnu16 && (asize != 4 && segment != NO_SEG))
+            badsize = asize;
+
         elf_sect_writeaddr(s, addr, asize);
         break;
     }
@@ -1245,38 +1332,30 @@ static void elf32_out(int32_t segto, const void *data,
     case OUT_REL1ADR:
         reltype = R_386_PC8;
         bytes = 1;
-        goto rel12adr;
+        gnu16 = "8-bit";
+        goto reladr;
     case OUT_REL2ADR:
         reltype = R_386_PC16;
         bytes = 2;
-        goto rel12adr;
+        gnu16 = "16-bit";
+        goto reladr;
+    case OUT_REL4ADR:
+        reltype = R_386_PC32;
+        bytes = 4;
+        goto reladr;
 
-rel12adr:
+reladr:
         addr = *(int64_t *)data - size;
         nasm_assert(segment != segto);
         if (segment != NO_SEG && (segment & 1)) {
             nasm_nonfatal("ELF format does not support"
-                          " segment base references");
+                          " relative segment base references");
+            gnu16 = NULL;       /* No need to print another message */
         } else {
             if (wrt == NO_SEG) {
                 elf_add_reloc(s, segment, 0, reltype);
-            } else {
-                nasm_nonfatal("Unsupported %d-bit ELF relocation", bytes << 3);
-            }
-        }
-        elf_sect_writeaddr(s, addr, bytes);
-        break;
-
-    case OUT_REL4ADR:
-        addr = *(int64_t *)data - size;
-        if (segment == segto)
-            nasm_panic("intra-segment OUT_REL4ADR");
-        if (segment != NO_SEG && (segment & 1)) {
-            nasm_nonfatal("ELF format does not support"
-                          " segment base references");
-        } else {
-            if (wrt == NO_SEG) {
-                elf_add_reloc(s, segment, 0, R_386_PC32);
+            } else if (bytes != 4) {
+                badsize = bytes;
             } else if (wrt == elf_plt_sect + 1) {
                 elf_add_reloc(s, segment, 0, R_386_PLT32);
             } else if (wrt == elf_gotpc_sect + 1 ||
@@ -1287,22 +1366,36 @@ rel12adr:
             } else {
                 nasm_nonfatal("ELF format does not support this"
                               " use of WRT");
-                wrt = NO_SEG;   /* we can at least _try_ to continue */
             }
         }
-        elf_sect_writeaddr(s, addr, 4);
+        elf_sect_writeaddr(s, addr, bytes);
         break;
 
     case OUT_REL8ADR:
-        nasm_nonfatal("32-bit ELF format does not support 64-bit relocations");
-        addr = 0;
+        badsize = 8;
+        addr = *(int64_t *)data - size;
         elf_sect_writeaddr(s, addr, 8);
         break;
 
     default:
         panic();
     }
+
+    if (badsize) {
+        nasm_nonfatal("unsupported %d-bit ELF32 relocation", badsize << 3);
+    } else if (gnu16) {
+        /*!
+         *!gnu-elf-extensions [off] using GNU extensions in ELF32
+         *!  warns if 8-bit, 16-bit or segment base relocations are
+         *!  used in the \c{elf32} output format. GNU extensions
+         *!  allow this; this warning checks for strict classic ELF32
+         *!  compliance.
+         */
+        nasm_warn(WARN_GNU_ELF_EXTENSIONS,
+                  "%s relocations in ELF32 is a GNU extension", gnu16);
+    }
 }
+
 static void elf64_out(int32_t segto, const void *data,
                       enum out_type type, uint64_t size,
                       int32_t segment, int32_t wrt)
