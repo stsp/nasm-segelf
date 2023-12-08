@@ -8,8 +8,6 @@ Source0: {{{ git_dir_archive }}}
 URL: https://github.com/stsp/nasm
 BuildRoot: /tmp/rpm-build-nasm
 Prefix: %{_prefix}
-BuildRequires: autoconf
-BuildRequires: automake
 BuildRequires: perl
 BuildRequires: gcc
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -23,7 +21,6 @@ instruction mnemonics and syntax.
 {{{ git_dir_setup_macro }}}
 
 %build
-sh autogen.sh
 %configure --enable-sections
 make %{?_smp_mflags}
 
