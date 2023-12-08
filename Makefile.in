@@ -42,6 +42,7 @@ RANLIB		= @RANLIB@
 STRIP		= @STRIP@
 
 tools		= $(top_srcdir)/tools
+aconf		= $(top_srcdir)/autoconf
 
 PERL		= perl
 PERLFLAGS	= -I$(top_srcdir)/perllib -I$(srcdir) -I.
@@ -209,7 +210,7 @@ PERLREQ = config/unconfig.h \
 INSDEP = x86/insns.dat x86/insns.pl x86/insns-iflags.ph x86/iflags.ph
 
 config/unconfig.h: config/config.h.in
-	$(RUNPERL) $(tools)/unconfig.pl \
+	$(RUNPERL) $(aconf)/unconfig.pl \
 		'$(srcdir)' config/config.h.in config/unconfig.h
 
 x86/iflag.c: $(INSDEP) | x86
