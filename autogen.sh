@@ -54,8 +54,8 @@ rm -rf autoconf/*m4.old
 		-t AC_CONFIG_FILES:'rm -f $*'
     echo 'rm -f config.log config.status'
     echo 'rm -rf autom4te.cache'
-) > autoconf/clean.sh
-sh autoconf/clean.sh
+) > /tmp/clean.sh
+sh /tmp/clean.sh
 
 # Try to regenerate unconfig.h if Perl is available and unconfig.pl
 # is present in the autoconf directory.
