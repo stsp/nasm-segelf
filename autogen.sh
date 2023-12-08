@@ -59,9 +59,9 @@ sh /tmp/clean.sh
 
 # Try to regenerate unconfig.h if Perl is available and unconfig.pl
 # is present in the autoconf directory.
-if [ -n "$(which perl)" -a -f autoconf/unconfig.pl ]; then
-    perl autoconf/unconfig.pl . config/config.h.in config/unconfig.h
-fi
+#if [ -n "$(which perl)" -a -f autoconf/unconfig.pl ]; then
+#    perl autoconf/unconfig.pl . config/config.h.in config/unconfig.h
+#fi
 
 if $recheck; then
     # This bizarre statement has to do with how config.status quotes its output
