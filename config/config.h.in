@@ -15,9 +15,6 @@
 /* Define to 1 if compiled with the -fgnu89-inline compiler flag */
 #undef CFLAGS_FGNU89_INLINE
 
-/* Define to 1 if compiled with the -flto compiler flag */
-#undef CFLAGS_FLTO
-
 /* Define to 1 if compiled with the -fno-common compiler flag */
 #undef CFLAGS_FNO_COMMON
 
@@ -40,17 +37,8 @@
 /* Define to 1 if compiled with the -fwrapv compiler flag */
 #undef CFLAGS_FWRAPV
 
-/* Define to 1 if compiled with the -ggdb3 compiler flag */
-#undef CFLAGS_GGDB3
-
-/* Define to 1 if compiled with the -O0 compiler flag */
-#undef CFLAGS_O0
-
 /* Define to 1 if compiled with the -pedantic compiler flag */
 #undef CFLAGS_PEDANTIC
-
-/* Define to 1 if compiled with the -pg compiler flag */
-#undef CFLAGS_PG
 
 /* Define to 1 if compiled with the -U__STRICT_ANSI__ compiler flag */
 #undef CFLAGS_U_STRICT_ANSI
@@ -154,6 +142,9 @@
 /* Define to 1 if compiled with the -std=c99 compiler flag */
 #undef CPPFLAGS_STD_C99
 
+/* Define to 1 if compiled with the -Werror=attributes compiler flag */
+#undef CPPFLAGS_WERROR_ATTRIBUTES
+
 /* Define to 1 if you have the `access' function. */
 #undef HAVE_ACCESS
 
@@ -222,93 +213,84 @@
 /* Define to 1 if you have the `ftruncate' function. */
 #undef HAVE_FTRUNCATE
 
-/* Define to 1 if your compiler supports __attribute__((alloc_size)) on
-   functions */
+/* Define to 1 if your compiler supports the alloc_size function attribute */
 #undef HAVE_FUNC_ATTRIBUTE1_ALLOC_SIZE
 
-/* Define to 1 if your compiler supports __attribute__((alloc_size)) on
-   functions */
+/* Define to 1 if your compiler supports the alloc_size function attribute */
 #undef HAVE_FUNC_ATTRIBUTE2_ALLOC_SIZE
 
-/* Define to 1 if your compiler supports __attribute__((format)) on functions
-   */
+/* Define to 1 if your compiler supports the format function attribute */
 #undef HAVE_FUNC_ATTRIBUTE3_FORMAT
 
-/* Define to 1 if your compiler supports __attribute__((cold)) on functions */
+/* Define to 1 if your compiler supports the cold function attribute */
 #undef HAVE_FUNC_ATTRIBUTE_COLD
 
-/* Define to 1 if your compiler supports __attribute__((const)) on functions
-   */
+/* Define to 1 if your compiler supports the const function attribute */
 #undef HAVE_FUNC_ATTRIBUTE_CONST
 
-/* Define to 1 if your compiler supports __attribute__((error)) on functions
-   */
+/* Define to 1 if your compiler supports the error attribute on functions */
 #undef HAVE_FUNC_ATTRIBUTE_ERROR
 
-/* Define to 1 if your compiler supports __attribute__((malloc)) on functions
-   */
+/* Define to 1 if your compiler supports the malloc function attribute */
 #undef HAVE_FUNC_ATTRIBUTE_MALLOC
 
-/* Define to 1 if your compiler supports __attribute__((noreturn)) on
-   functions */
+/* Define to 1 if your compiler supports the noreturn function attribute */
 #undef HAVE_FUNC_ATTRIBUTE_NORETURN
 
-/* Define to 1 if your compiler supports __attribute__((pure)) on functions */
+/* Define to 1 if your compiler supports the pure function attribute */
 #undef HAVE_FUNC_ATTRIBUTE_PURE
 
-/* Define to 1 if your compiler supports __attribute__((returns_nonnull)) on
-   functions */
+/* Define to 1 if your compiler supports the returns_nonnull function
+   attribute */
 #undef HAVE_FUNC_ATTRIBUTE_RETURNS_NONNULL
 
-/* Define to 1 if your compiler supports __attribute__((sentinel)) on
-   functions */
+/* Define to 1 if your compiler supports the sentinel function attribute */
 #undef HAVE_FUNC_ATTRIBUTE_SENTINEL
 
-/* Define to 1 if your compiler supports __attribute__((unused)) on functions
-   */
+/* Define to 1 if your compiler supports the unused function attribute */
 #undef HAVE_FUNC_ATTRIBUTE_UNUSED
 
-/* Define to 1 if your compiler supports __attribute__((alloc_size)) on
-   function pointers */
+/* Define to 1 if your compiler supports the alloc_size attribute on function
+   pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE1_ALLOC_SIZE
 
-/* Define to 1 if your compiler supports __attribute__((alloc_size)) on
-   function pointers */
+/* Define to 1 if your compiler supports the alloc_size attribute on function
+   pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE2_ALLOC_SIZE
 
-/* Define to 1 if your compiler supports __attribute__((format)) on function
+/* Define to 1 if your compiler supports the format attribute on function
    pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE3_FORMAT
 
-/* Define to 1 if your compiler supports __attribute__((cold)) on function
+/* Define to 1 if your compiler supports the cold attribute on function
    pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE_COLD
 
-/* Define to 1 if your compiler supports __attribute__((const)) on function
+/* Define to 1 if your compiler supports the const attribute on function
    pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE_CONST
 
-/* Define to 1 if your compiler supports __attribute__((malloc)) on function
+/* Define to 1 if your compiler supports the malloc attribute on function
    pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE_MALLOC
 
-/* Define to 1 if your compiler supports __attribute__((noreturn)) on function
+/* Define to 1 if your compiler supports the noreturn attribute on function
    pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE_NORETURN
 
-/* Define to 1 if your compiler supports __attribute__((pure)) on function
+/* Define to 1 if your compiler supports the pure attribute on function
    pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE_PURE
 
-/* Define to 1 if your compiler supports __attribute__((returns_nonnull)) on
+/* Define to 1 if your compiler supports the returns_nonnull attribute on
    function pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE_RETURNS_NONNULL
 
-/* Define to 1 if your compiler supports __attribute__((sentinel)) on function
+/* Define to 1 if your compiler supports the sentinel attribute on function
    pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE_SENTINEL
 
-/* Define to 1 if your compiler supports __attribute__((unused)) on function
+/* Define to 1 if your compiler supports the unused attribute on function
    pointers */
 #undef HAVE_FUNC_PTR_ATTRIBUTE_UNUSED
 
@@ -559,6 +541,9 @@
 #undef HAVE___CPU_TO_LE64
 
 /* Define to 1 if compiled with the -Wl */
+#undef LDFLAGS_WL_AS_NEEDED
+
+/* Define to 1 if compiled with the -Wl */
 #undef LDFLAGS_WL_GC_SECTIONS
 
 /* Define to the address where bug reports for this package should be sent. */
@@ -734,7 +719,7 @@
 
 #ifndef alloc_size_func2
 # ifdef HAVE_FUNC_ATTRIBUTE2_ALLOC_SIZE
-#  define alloc_size_func2(x1,x2) __attribute__((alloc_size(x1,x2)))
+#  define alloc_size_func2(x1,x2) ATTRIBUTE(alloc_size(x1,x2))
 # else
 #  define alloc_size_func2(x1,x2)
 # endif
@@ -742,7 +727,7 @@
 
 #ifndef alloc_size_func2_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE2_ALLOC_SIZE
-#  define alloc_size_func2_ptr(x1,x2) __attribute__((alloc_size(x1,x2)))
+#  define alloc_size_func2_ptr(x1,x2) ATTRIBUTE(alloc_size(x1,x2))
 # else
 #  define alloc_size_func2_ptr(x1,x2)
 # endif
@@ -750,7 +735,7 @@
 
 #ifndef end_with_null
 # ifdef HAVE_FUNC_ATTRIBUTE_SENTINEL
-#  define end_with_null __attribute__((sentinel))
+#  define end_with_null ATTRIBUTE(sentinel)
 # else
 #  define end_with_null
 # endif
@@ -758,7 +743,7 @@
 
 #ifndef end_with_null_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE_SENTINEL
-#  define end_with_null_ptr __attribute__((sentinel))
+#  define end_with_null_ptr ATTRIBUTE(sentinel)
 # else
 #  define end_with_null_ptr
 # endif
@@ -766,7 +751,7 @@
 
 #ifndef format_func3
 # ifdef HAVE_FUNC_ATTRIBUTE3_FORMAT
-#  define format_func3(x1,x2,x3) __attribute__((format(x1,x2,x3)))
+#  define format_func3(x1,x2,x3) ATTRIBUTE(format(x1,x2,x3))
 # else
 #  define format_func3(x1,x2,x3)
 # endif
@@ -774,7 +759,7 @@
 
 #ifndef format_func3_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE3_FORMAT
-#  define format_func3_ptr(x1,x2,x3) __attribute__((format(x1,x2,x3)))
+#  define format_func3_ptr(x1,x2,x3) ATTRIBUTE(format(x1,x2,x3))
 # else
 #  define format_func3_ptr(x1,x2,x3)
 # endif
@@ -782,7 +767,7 @@
 
 #ifndef const_func
 # ifdef HAVE_FUNC_ATTRIBUTE_CONST
-#  define const_func __attribute__((const))
+#  define const_func ATTRIBUTE(const)
 # else
 #  define const_func
 # endif
@@ -790,7 +775,7 @@
 
 #ifndef const_func_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE_CONST
-#  define const_func_ptr __attribute__((const))
+#  define const_func_ptr ATTRIBUTE(const)
 # else
 #  define const_func_ptr
 # endif
@@ -798,7 +783,7 @@
 
 #ifndef pure_func
 # ifdef HAVE_FUNC_ATTRIBUTE_PURE
-#  define pure_func __attribute__((pure))
+#  define pure_func ATTRIBUTE(pure)
 # else
 #  define pure_func
 # endif
@@ -806,7 +791,7 @@
 
 #ifndef pure_func_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE_PURE
-#  define pure_func_ptr __attribute__((pure))
+#  define pure_func_ptr ATTRIBUTE(pure)
 # else
 #  define pure_func_ptr
 # endif
@@ -814,7 +799,7 @@
 
 #ifndef noreturn_func
 # ifdef HAVE_FUNC_ATTRIBUTE_NORETURN
-#  define noreturn_func __attribute__((noreturn))
+#  define noreturn_func ATTRIBUTE(noreturn)
 # else
 #  define noreturn_func
 # endif
@@ -822,7 +807,7 @@
 
 #ifndef unlikely_func
 # ifdef HAVE_FUNC_ATTRIBUTE_COLD
-#  define unlikely_func __attribute__((cold))
+#  define unlikely_func ATTRIBUTE(cold)
 # else
 #  define unlikely_func
 # endif
@@ -830,7 +815,7 @@
 
 #ifndef unlikely_func_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE_COLD
-#  define unlikely_func_ptr __attribute__((cold))
+#  define unlikely_func_ptr ATTRIBUTE(cold)
 # else
 #  define unlikely_func_ptr
 # endif
@@ -838,7 +823,7 @@
 
 #ifndef unused_func
 # ifdef HAVE_FUNC_ATTRIBUTE_UNUSED
-#  define unused_func __attribute__((unused))
+#  define unused_func ATTRIBUTE(unused)
 # else
 #  define unused_func
 # endif
@@ -846,7 +831,7 @@
 
 #ifndef unused_func_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE_UNUSED
-#  define unused_func_ptr __attribute__((unused))
+#  define unused_func_ptr ATTRIBUTE(unused)
 # else
 #  define unused_func_ptr
 # endif
@@ -854,7 +839,7 @@
 
 #ifndef noreturn_func_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE_NORETURN
-#  define noreturn_func_ptr __attribute__((noreturn))
+#  define noreturn_func_ptr ATTRIBUTE(noreturn)
 # else
 #  define noreturn_func_ptr
 # endif
@@ -862,7 +847,7 @@
 
 #ifndef never_null
 # ifdef HAVE_FUNC_ATTRIBUTE_RETURNS_NONNULL
-#  define never_null __attribute__((returns_nonnull))
+#  define never_null ATTRIBUTE(returns_nonnull)
 # else
 #  define never_null
 # endif
@@ -870,7 +855,7 @@
 
 #ifndef never_null_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE_RETURNS_NONNULL
-#  define never_null_ptr __attribute__((returns_nonnull))
+#  define never_null_ptr ATTRIBUTE(returns_nonnull)
 # else
 #  define never_null_ptr
 # endif
@@ -878,7 +863,7 @@
 
 #ifndef malloc_func
 # ifdef HAVE_FUNC_ATTRIBUTE_MALLOC
-#  define malloc_func __attribute__((malloc))
+#  define malloc_func ATTRIBUTE(malloc)
 # else
 #  define malloc_func
 # endif
@@ -886,7 +871,7 @@
 
 #ifndef malloc_func_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE_MALLOC
-#  define malloc_func_ptr __attribute__((malloc))
+#  define malloc_func_ptr ATTRIBUTE(malloc)
 # else
 #  define malloc_func_ptr
 # endif
@@ -894,7 +879,7 @@
 
 #ifndef alloc_size_func1
 # ifdef HAVE_FUNC_ATTRIBUTE1_ALLOC_SIZE
-#  define alloc_size_func1(x1) __attribute__((alloc_size(x1)))
+#  define alloc_size_func1(x1) ATTRIBUTE(alloc_size(x1))
 # else
 #  define alloc_size_func1(x1)
 # endif
@@ -902,7 +887,7 @@
 
 #ifndef alloc_size_func1_ptr
 # ifdef HAVE_FUNC_PTR_ATTRIBUTE1_ALLOC_SIZE
-#  define alloc_size_func1_ptr(x1) __attribute__((alloc_size(x1)))
+#  define alloc_size_func1_ptr(x1) ATTRIBUTE(alloc_size(x1))
 # else
 #  define alloc_size_func1_ptr(x1)
 # endif

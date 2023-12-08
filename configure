@@ -730,19 +730,18 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_gdb
-enable_optimization
+enable_debug
 enable_profiling
 enable_largefile
 enable_panic_abort
 with_nsis
 enable_pdf_compression
-enable_sections
+enable_gc
 enable_lto
 enable_sanitizer
 enable_pedantic
 enable_werror
 enable_suggestions
-enable_ccache
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1372,22 +1371,21 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-gdb            compile with extra debug information for GDB
-                          debugger
-  --disable-optimization  compile without optimization (-O0) to help debugging
+  --disable-gdb           disable gdb debug extensions
+  --enable-debug          optimize for debugging
   --enable-profiling      compile with profiling (-pg option)
   --disable-largefile     omit support for large files
   --enable-panic-abort    call abort() on panic to trap in the debugger
   --disable-pdf-compression
                           generate an uncompressed documentation PDF
-  --disable-sections      do not try to compile with function/data section
+  --disable-gc            do not compile with dead code garbage collection
                           support
-  --enable-lto            compile with gcc-style link time optimization
+  --enable-lto            Try to enable link-time optimization for this
+                          compiler
   --enable-sanitizer      compile with sanitizers enabled
   --disable-pedantic      disable some extra paranoid compiler warnings
   --enable-werror         compile with -Werror to error out on any warning
   --enable-suggestions    compile with compiler suggestion warnings enabled
-  --enable-ccache         compile with ccache
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1660,49 +1658,6 @@ printf "%s\n" "$ac_res" >&6; }
 
 } # ac_fn_c_check_type
 
-# ac_fn_c_try_run LINENO
-# ----------------------
-# Try to run conftest.$ac_ext, and return whether this succeeded. Assumes that
-# executables *can* be run.
-ac_fn_c_try_run ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-printf "%s\n" "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
-  { { case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-printf "%s\n" "$ac_try_echo"; } >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }
-then :
-  ac_retval=0
-else $as_nop
-  printf "%s\n" "$as_me: program exited with status $ac_status" >&5
-       printf "%s\n" "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-       ac_retval=$ac_status
-fi
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_try_run
-
 # ac_fn_c_check_func LINENO FUNC VAR
 # ----------------------------------
 # Tests whether FUNC exists, setting the cache variable VAR accordingly
@@ -1764,6 +1719,49 @@ printf "%s\n" "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_func
+
+# ac_fn_c_try_run LINENO
+# ----------------------
+# Try to run conftest.$ac_ext, and return whether this succeeded. Assumes that
+# executables *can* be run.
+ac_fn_c_try_run ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+printf "%s\n" "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
+  { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+printf "%s\n" "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+then :
+  ac_retval=0
+else $as_nop
+  printf "%s\n" "$as_me: program exited with status $ac_status" >&5
+       printf "%s\n" "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+       ac_retval=$ac_status
+fi
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_try_run
 
 # ac_fn_check_decl LINENO SYMBOL VAR INCLUDES EXTRA-OPTIONS FLAG-VAR
 # ------------------------------------------------------------------
@@ -4153,88 +4151,6 @@ if test ${enable_gdb+y}
 then :
   enableval=$enable_gdb; pa_arg_bool_enableval="$enableval"
 else $as_nop
-  pa_arg_bool_enableval="no"
-fi
-
-
- if test x"$pa_arg_bool_enableval" != xno
-then :
-
-
-
-
-
-  _PA_ADD_FLAGS_CFLAGS_orig=$CFLAGS
-  CFLAGS="$CFLAGS -ggdb3"
-  _PA_ADD_FLAGS_CFLAGS_ok=yes
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -ggdb3" >&5
-printf %s "checking if $CC accepts -ggdb3... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdio.h>
-int
-main (void)
-{
-FILE *f = fopen ("conftest.out", "w");
- return ferror (f) || fclose (f) != 0;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-       _PA_ADD_FLAGS_CFLAGS_ok=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-     ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
- if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
-then :
-
-
-printf "%s\n" "#define CFLAGS_GGDB3 1" >>confdefs.h
-
-
-else $as_nop
-  CFLAGS="$_PA_ADD_FLAGS_CFLAGS_orig"
-
-fi
-
-
-
-
-
-fi
-
-
-
-
- # Check whether --enable-optimization was given.
-if test ${enable_optimization+y}
-then :
-  enableval=$enable_optimization; pa_arg_bool_enableval="$enableval"
-else $as_nop
   pa_arg_bool_enableval="yes"
 fi
 
@@ -4244,139 +4160,24 @@ then :
 
 else $as_nop
 
+fi
 
 
 
-
-  _PA_ADD_FLAGS_CFLAGS_orig=$CFLAGS
-  CFLAGS="$CFLAGS -O0"
-  _PA_ADD_FLAGS_CFLAGS_ok=yes
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
+ # Check whether --enable-debug was given.
+if test ${enable_debug+y}
 then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -O0" >&5
-printf %s "checking if $CC accepts -O0... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdio.h>
-int
-main (void)
-{
-FILE *f = fopen ("conftest.out", "w");
- return ferror (f) || fclose (f) != 0;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
+  enableval=$enable_debug; pa_arg_bool_enableval="$enableval"
 else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-       _PA_ADD_FLAGS_CFLAGS_ok=no
+  pa_arg_bool_enableval="no"
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-     ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
- if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
+ if test x"$pa_arg_bool_enableval" != xno
 then :
 
 
-printf "%s\n" "#define CFLAGS_O0 1" >>confdefs.h
-
-
-else $as_nop
-  CFLAGS="$_PA_ADD_FLAGS_CFLAGS_orig"
-
 fi
-
-
-
-
-
-
-
-
-
-
-  _PA_ADD_FLAGS_CFLAGS_orig=$CFLAGS
-  CFLAGS="$CFLAGS -fno-omit-frame-pointer"
-  _PA_ADD_FLAGS_CFLAGS_ok=yes
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -fno-omit-frame-pointer" >&5
-printf %s "checking if $CC accepts -fno-omit-frame-pointer... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdio.h>
-int
-main (void)
-{
-FILE *f = fopen ("conftest.out", "w");
- return ferror (f) || fclose (f) != 0;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-       _PA_ADD_FLAGS_CFLAGS_ok=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-     ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
- if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
-then :
-
-
-printf "%s\n" "#define CFLAGS_FNO_OMIT_FRAME_POINTER 1" >>confdefs.h
-
-
-else $as_nop
-  CFLAGS="$_PA_ADD_FLAGS_CFLAGS_orig"
-
-fi
-
-
-
-
-
-fi
-
 
 
 
@@ -4391,71 +4192,6 @@ fi
 
  if test x"$pa_arg_bool_enableval" != xno
 then :
-
-
-
-
-
-  _PA_ADD_FLAGS_CFLAGS_orig=$CFLAGS
-  CFLAGS="$CFLAGS -pg"
-  _PA_ADD_FLAGS_CFLAGS_ok=yes
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -pg" >&5
-printf %s "checking if $CC accepts -pg... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdio.h>
-int
-main (void)
-{
-FILE *f = fopen ("conftest.out", "w");
- return ferror (f) || fclose (f) != 0;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-       _PA_ADD_FLAGS_CFLAGS_ok=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-     ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
- if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
-then :
-
-
-printf "%s\n" "#define CFLAGS_PG 1" >>confdefs.h
-
-
-else $as_nop
-  CFLAGS="$_PA_ADD_FLAGS_CFLAGS_orig"
-
-fi
-
-
-
-
 
 fi
 
@@ -4693,242 +4429,6 @@ else $as_nop
 printf "%s\n" "#define size_t unsigned int" >>confdefs.h
 
 fi
-
- { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether byte ordering is bigendian" >&5
-printf %s "checking whether byte ordering is bigendian... " >&6; }
-if test ${ac_cv_c_bigendian+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_cv_c_bigendian=unknown
-    # See if we're dealing with a universal compiler.
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#ifndef __APPLE_CC__
-	       not a universal capable compiler
-	     #endif
-	     typedef int dummy;
-
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-
-	# Check for potential -arch flags.  It is not universal unless
-	# there are at least two -arch flags with different values.
-	ac_arch=
-	ac_prev=
-	for ac_word in $CC $CFLAGS $CPPFLAGS $LDFLAGS; do
-	 if test -n "$ac_prev"; then
-	   case $ac_word in
-	     i?86 | x86_64 | ppc | ppc64)
-	       if test -z "$ac_arch" || test "$ac_arch" = "$ac_word"; then
-		 ac_arch=$ac_word
-	       else
-		 ac_cv_c_bigendian=universal
-		 break
-	       fi
-	       ;;
-	   esac
-	   ac_prev=
-	 elif test "x$ac_word" = "x-arch"; then
-	   ac_prev=arch
-	 fi
-       done
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-    if test $ac_cv_c_bigendian = unknown; then
-      # See if sys/param.h defines the BYTE_ORDER macro.
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/types.h>
-	     #include <sys/param.h>
-
-int
-main (void)
-{
-#if ! (defined BYTE_ORDER && defined BIG_ENDIAN \
-		     && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN \
-		     && LITTLE_ENDIAN)
-	      bogus endian macros
-	     #endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  # It does; now see whether it defined to BIG_ENDIAN or not.
-	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <sys/types.h>
-		#include <sys/param.h>
-
-int
-main (void)
-{
-#if BYTE_ORDER != BIG_ENDIAN
-		 not big endian
-		#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  ac_cv_c_bigendian=yes
-else $as_nop
-  ac_cv_c_bigendian=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-    fi
-    if test $ac_cv_c_bigendian = unknown; then
-      # See if <limits.h> defines _LITTLE_ENDIAN or _BIG_ENDIAN (e.g., Solaris).
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <limits.h>
-
-int
-main (void)
-{
-#if ! (defined _LITTLE_ENDIAN || defined _BIG_ENDIAN)
-	      bogus endian macros
-	     #endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  # It does; now see whether it defined to _BIG_ENDIAN or not.
-	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <limits.h>
-
-int
-main (void)
-{
-#ifndef _BIG_ENDIAN
-		 not big endian
-		#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  ac_cv_c_bigendian=yes
-else $as_nop
-  ac_cv_c_bigendian=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-    fi
-    if test $ac_cv_c_bigendian = unknown; then
-      # Compile a test program.
-      if test "$cross_compiling" = yes
-then :
-  # Try to guess by grepping values from an object file.
-	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-unsigned short int ascii_mm[] =
-		  { 0x4249, 0x4765, 0x6E44, 0x6961, 0x6E53, 0x7953, 0 };
-		unsigned short int ascii_ii[] =
-		  { 0x694C, 0x5454, 0x656C, 0x6E45, 0x6944, 0x6E61, 0 };
-		int use_ascii (int i) {
-		  return ascii_mm[i] + ascii_ii[i];
-		}
-		unsigned short int ebcdic_ii[] =
-		  { 0x89D3, 0xE3E3, 0x8593, 0x95C5, 0x89C4, 0x9581, 0 };
-		unsigned short int ebcdic_mm[] =
-		  { 0xC2C9, 0xC785, 0x95C4, 0x8981, 0x95E2, 0xA8E2, 0 };
-		int use_ebcdic (int i) {
-		  return ebcdic_mm[i] + ebcdic_ii[i];
-		}
-		extern int foo;
-
-int
-main (void)
-{
-return use_ascii (foo) == use_ebcdic (foo);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  if grep BIGenDianSyS conftest.$ac_objext >/dev/null; then
-	      ac_cv_c_bigendian=yes
-	    fi
-	    if grep LiTTleEnDian conftest.$ac_objext >/dev/null ; then
-	      if test "$ac_cv_c_bigendian" = unknown; then
-		ac_cv_c_bigendian=no
-	      else
-		# finding both strings is unlikely to happen, but who knows?
-		ac_cv_c_bigendian=unknown
-	      fi
-	    fi
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$ac_includes_default
-int
-main (void)
-{
-
-	     /* Are we little or big endian?  From Harbison&Steele.  */
-	     union
-	     {
-	       long int l;
-	       char c[sizeof (long int)];
-	     } u;
-	     u.l = 1;
-	     return u.c[sizeof (long int) - 1] == 1;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_run "$LINENO"
-then :
-  ac_cv_c_bigendian=no
-else $as_nop
-  ac_cv_c_bigendian=yes
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-    fi
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_c_bigendian" >&5
-printf "%s\n" "$ac_cv_c_bigendian" >&6; }
- case $ac_cv_c_bigendian in #(
-   yes)
-     printf "%s\n" "#define WORDS_BIGENDIAN 1" >>confdefs.h
-;; #(
-   no)
-     printf "%s\n" "#define WORDS_LITTLEENDIAN 1" >>confdefs.h
- ;; #(
-   universal)
-
-printf "%s\n" "#define AC_APPLE_UNIVERSAL_BUILD 1" >>confdefs.h
-
-     ;; #(
-   *)
-     as_fn_error $? "unknown endianness
- presetting ac_cv_c_bigendian=no (or yes) will help" "$LINENO" 5 ;;
- esac
-
-
 
 
 
@@ -6407,12 +5907,18 @@ fi
 
 done
 
-ac_fn_c_check_header_compile "$LINENO" "inttypes.h" "ac_cv_header_inttypes_h" "$ac_includes_default"
+       for ac_header in inttypes.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "inttypes.h" "ac_cv_header_inttypes_h" "$ac_includes_default"
 if test "x$ac_cv_header_inttypes_h" = xyes
 then :
   printf "%s\n" "#define HAVE_INTTYPES_H 1" >>confdefs.h
+ ac_includes_default="$ac_includes_default
+#include <inttypes.h>"
 
 fi
+
+done
 
 ac_fn_c_check_header_compile "$LINENO" "strings.h" "ac_cv_header_strings_h" "$ac_includes_default"
 if test "x$ac_cv_header_strings_h" = xyes
@@ -7655,6 +7161,242 @@ fi
 
 
 
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether byte ordering is bigendian" >&5
+printf %s "checking whether byte ordering is bigendian... " >&6; }
+if test ${ac_cv_c_bigendian+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_cv_c_bigendian=unknown
+    # See if we're dealing with a universal compiler.
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#ifndef __APPLE_CC__
+	       not a universal capable compiler
+	     #endif
+	     typedef int dummy;
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+
+	# Check for potential -arch flags.  It is not universal unless
+	# there are at least two -arch flags with different values.
+	ac_arch=
+	ac_prev=
+	for ac_word in $CC $CFLAGS $CPPFLAGS $LDFLAGS; do
+	 if test -n "$ac_prev"; then
+	   case $ac_word in
+	     i?86 | x86_64 | ppc | ppc64)
+	       if test -z "$ac_arch" || test "$ac_arch" = "$ac_word"; then
+		 ac_arch=$ac_word
+	       else
+		 ac_cv_c_bigendian=universal
+		 break
+	       fi
+	       ;;
+	   esac
+	   ac_prev=
+	 elif test "x$ac_word" = "x-arch"; then
+	   ac_prev=arch
+	 fi
+       done
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+    if test $ac_cv_c_bigendian = unknown; then
+      # See if sys/param.h defines the BYTE_ORDER macro.
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/types.h>
+	     #include <sys/param.h>
+
+int
+main (void)
+{
+#if ! (defined BYTE_ORDER && defined BIG_ENDIAN \
+		     && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN \
+		     && LITTLE_ENDIAN)
+	      bogus endian macros
+	     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  # It does; now see whether it defined to BIG_ENDIAN or not.
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sys/types.h>
+		#include <sys/param.h>
+
+int
+main (void)
+{
+#if BYTE_ORDER != BIG_ENDIAN
+		 not big endian
+		#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_cv_c_bigendian=yes
+else $as_nop
+  ac_cv_c_bigendian=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+    fi
+    if test $ac_cv_c_bigendian = unknown; then
+      # See if <limits.h> defines _LITTLE_ENDIAN or _BIG_ENDIAN (e.g., Solaris).
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <limits.h>
+
+int
+main (void)
+{
+#if ! (defined _LITTLE_ENDIAN || defined _BIG_ENDIAN)
+	      bogus endian macros
+	     #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  # It does; now see whether it defined to _BIG_ENDIAN or not.
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <limits.h>
+
+int
+main (void)
+{
+#ifndef _BIG_ENDIAN
+		 not big endian
+		#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  ac_cv_c_bigendian=yes
+else $as_nop
+  ac_cv_c_bigendian=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+    fi
+    if test $ac_cv_c_bigendian = unknown; then
+      # Compile a test program.
+      if test "$cross_compiling" = yes
+then :
+  # Try to guess by grepping values from an object file.
+	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+unsigned short int ascii_mm[] =
+		  { 0x4249, 0x4765, 0x6E44, 0x6961, 0x6E53, 0x7953, 0 };
+		unsigned short int ascii_ii[] =
+		  { 0x694C, 0x5454, 0x656C, 0x6E45, 0x6944, 0x6E61, 0 };
+		int use_ascii (int i) {
+		  return ascii_mm[i] + ascii_ii[i];
+		}
+		unsigned short int ebcdic_ii[] =
+		  { 0x89D3, 0xE3E3, 0x8593, 0x95C5, 0x89C4, 0x9581, 0 };
+		unsigned short int ebcdic_mm[] =
+		  { 0xC2C9, 0xC785, 0x95C4, 0x8981, 0x95E2, 0xA8E2, 0 };
+		int use_ebcdic (int i) {
+		  return ebcdic_mm[i] + ebcdic_ii[i];
+		}
+		extern int foo;
+
+int
+main (void)
+{
+return use_ascii (foo) == use_ebcdic (foo);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  if grep BIGenDianSyS conftest.$ac_objext >/dev/null; then
+	      ac_cv_c_bigendian=yes
+	    fi
+	    if grep LiTTleEnDian conftest.$ac_objext >/dev/null ; then
+	      if test "$ac_cv_c_bigendian" = unknown; then
+		ac_cv_c_bigendian=no
+	      else
+		# finding both strings is unlikely to happen, but who knows?
+		ac_cv_c_bigendian=unknown
+	      fi
+	    fi
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_includes_default
+int
+main (void)
+{
+
+	     /* Are we little or big endian?  From Harbison&Steele.  */
+	     union
+	     {
+	       long int l;
+	       char c[sizeof (long int)];
+	     } u;
+	     u.l = 1;
+	     return u.c[sizeof (long int) - 1] == 1;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_run "$LINENO"
+then :
+  ac_cv_c_bigendian=no
+else $as_nop
+  ac_cv_c_bigendian=yes
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+    fi
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_c_bigendian" >&5
+printf "%s\n" "$ac_cv_c_bigendian" >&6; }
+ case $ac_cv_c_bigendian in #(
+   yes)
+     printf "%s\n" "#define WORDS_BIGENDIAN 1" >>confdefs.h
+;; #(
+   no)
+     printf "%s\n" "#define WORDS_LITTLEENDIAN 1" >>confdefs.h
+ ;; #(
+   universal)
+
+printf "%s\n" "#define AC_APPLE_UNIVERSAL_BUILD 1" >>confdefs.h
+
+     ;; #(
+   *)
+     as_fn_error $? "unknown endianness
+ presetting ac_cv_c_bigendian=no (or yes) will help" "$LINENO" 5 ;;
+ esac
+
+
+
        for ac_header in endian.h
 do :
   ac_fn_c_check_header_compile "$LINENO" "endian.h" "ac_cv_header_endian_h" "$ac_includes_default"
@@ -8284,13 +8026,82 @@ fi
 
 
 
+
+  _PA_ADD_FLAGS_CPPFLAGS_orig=$CPPFLAGS
+  CPPFLAGS="$CPPFLAGS -Werror=attributes"
+  _PA_ADD_FLAGS_CPPFLAGS_ok=yes
+
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+if test "x$_PA_ADD_FLAGS_CPPFLAGS_ok" = xyes
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -Werror=attributes" >&5
+printf %s "checking if $CC accepts -Werror=attributes... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+int
+main (void)
+{
+FILE *f = fopen ("conftest.out", "w");
+ return ferror (f) || fclose (f) != 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+       _PA_ADD_FLAGS_CPPFLAGS_ok=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+     ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+ if test "x$_PA_ADD_FLAGS_CPPFLAGS_ok" = xyes
+then :
+
+
+printf "%s\n" "#define CPPFLAGS_WERROR_ATTRIBUTES 1" >>confdefs.h
+
+
+else $as_nop
+  CPPFLAGS="$_PA_ADD_FLAGS_CPPFLAGS_orig"
+
+fi
+
+
+
+
+
+
+
+
+
  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC supports the noreturn function attribute" >&5
 printf %s "checking if $CC supports the noreturn function attribute... " >&6; }
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((noreturn))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(noreturn)
   bar(int);
 void * foo(void);
 void * foo(void)
@@ -8324,7 +8135,10 @@ printf %s "checking if $CC supports the noreturn function attribute on pointers.
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((noreturn))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(noreturn)
   (*bar1)(int);
 void * foo1(void);
 void * foo1(void)
@@ -8333,7 +8147,7 @@ void * foo1(void)
 		bar1(1);
 }
 
-typedef void *  __attribute__((noreturn))
+typedef void * ATTRIBUTE(noreturn)
   (*bar_t)(int);
 extern bar_t bar2;
 void * foo2(void);
@@ -8368,7 +8182,10 @@ printf %s "checking if $CC supports the returns_nonnull function attribute... " 
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((returns_nonnull))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(returns_nonnull)
   bar(int);
 void * foo(void);
 void * foo(void)
@@ -8402,7 +8219,10 @@ printf %s "checking if $CC supports the returns_nonnull function attribute on po
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((returns_nonnull))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(returns_nonnull)
   (*bar1)(int);
 void * foo1(void);
 void * foo1(void)
@@ -8411,7 +8231,7 @@ void * foo1(void)
 		bar1(1);
 }
 
-typedef void *  __attribute__((returns_nonnull))
+typedef void * ATTRIBUTE(returns_nonnull)
   (*bar_t)(int);
 extern bar_t bar2;
 void * foo2(void);
@@ -8446,7 +8266,10 @@ printf %s "checking if $CC supports the malloc function attribute... " >&6; }
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((malloc))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(malloc)
   bar(int);
 void * foo(void);
 void * foo(void)
@@ -8480,7 +8303,10 @@ printf %s "checking if $CC supports the malloc function attribute on pointers...
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((malloc))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(malloc)
   (*bar1)(int);
 void * foo1(void);
 void * foo1(void)
@@ -8489,7 +8315,7 @@ void * foo1(void)
 		bar1(1);
 }
 
-typedef void *  __attribute__((malloc))
+typedef void * ATTRIBUTE(malloc)
   (*bar_t)(int);
 extern bar_t bar2;
 void * foo2(void);
@@ -8524,13 +8350,16 @@ printf %s "checking if $CC supports the alloc_size(1) function attribute... " >&
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((alloc_size(1)))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(alloc_size(1))
   bar(int);
 void * foo(void);
 void * foo(void)
 {
 	return
-		bar(1);
+		bar(80);
 }
 
 _ACEOF
@@ -8558,23 +8387,26 @@ printf %s "checking if $CC supports the alloc_size(1) function attribute on poin
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((alloc_size(1)))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(alloc_size(1))
   (*bar1)(int);
 void * foo1(void);
 void * foo1(void)
 {
 	return
-		bar1(1);
+		bar1(80);
 }
 
-typedef void *  __attribute__((alloc_size(1)))
+typedef void * ATTRIBUTE(alloc_size(1))
   (*bar_t)(int);
 extern bar_t bar2;
 void * foo2(void);
 void * foo2(void)
 {
 	return
-		bar2(1);
+		bar2(80);
 }
 
 _ACEOF
@@ -8602,13 +8434,16 @@ printf %s "checking if $CC supports the alloc_size(1,2) function attribute... " 
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((alloc_size(1,2)))
-  bar(int);
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(alloc_size(1,2))
+  bar(int,int);
 void * foo(void);
 void * foo(void)
 {
 	return
-		bar(1);
+		bar(20,40);
 }
 
 _ACEOF
@@ -8636,23 +8471,26 @@ printf %s "checking if $CC supports the alloc_size(1,2) function attribute on po
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((alloc_size(1,2)))
-  (*bar1)(int);
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(alloc_size(1,2))
+  (*bar1)(int,int);
 void * foo1(void);
 void * foo1(void)
 {
 	return
-		bar1(1);
+		bar1(20,40);
 }
 
-typedef void *  __attribute__((alloc_size(1,2)))
-  (*bar_t)(int);
+typedef void * ATTRIBUTE(alloc_size(1,2))
+  (*bar_t)(int,int);
 extern bar_t bar2;
 void * foo2(void);
 void * foo2(void)
 {
 	return
-		bar2(1);
+		bar2(20,40);
 }
 
 _ACEOF
@@ -8680,7 +8518,10 @@ printf %s "checking if $CC supports the sentinel function attribute... " >&6; }
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((sentinel))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(sentinel)
   bar(const char *, ...);
 void * foo(void);
 void * foo(void)
@@ -8714,7 +8555,10 @@ printf %s "checking if $CC supports the sentinel function attribute on pointers.
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((sentinel))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(sentinel)
   (*bar1)(const char *, ...);
 void * foo1(void);
 void * foo1(void)
@@ -8723,7 +8567,7 @@ void * foo1(void)
 		bar1("a","b",NULL);
 }
 
-typedef void *  __attribute__((sentinel))
+typedef void * ATTRIBUTE(sentinel)
   (*bar_t)(const char *, ...);
 extern bar_t bar2;
 void * foo2(void);
@@ -8758,7 +8602,10 @@ printf %s "checking if $CC supports the format(printf,1,2) function attribute...
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern int  __attribute__((format(printf,1,2)))
+#include "autoconf/attribute.h"
+
+
+extern int ATTRIBUTE(format(printf,1,2))
   bar(const char *, ...);
 int foo(void);
 int foo(void)
@@ -8792,7 +8639,10 @@ printf %s "checking if $CC supports the format(printf,1,2) function attribute on
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern int  __attribute__((format(printf,1,2)))
+#include "autoconf/attribute.h"
+
+
+extern int ATTRIBUTE(format(printf,1,2))
   (*bar1)(const char *, ...);
 int foo1(void);
 int foo1(void)
@@ -8801,7 +8651,7 @@ int foo1(void)
 		bar1("%d",1);
 }
 
-typedef int  __attribute__((format(printf,1,2)))
+typedef int ATTRIBUTE(format(printf,1,2))
   (*bar_t)(const char *, ...);
 extern bar_t bar2;
 int foo2(void);
@@ -8836,7 +8686,10 @@ printf %s "checking if $CC supports the const function attribute... " >&6; }
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((const))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(const)
   bar(int);
 void * foo(void);
 void * foo(void)
@@ -8870,7 +8723,10 @@ printf %s "checking if $CC supports the const function attribute on pointers... 
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((const))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(const)
   (*bar1)(int);
 void * foo1(void);
 void * foo1(void)
@@ -8879,7 +8735,7 @@ void * foo1(void)
 		bar1(1);
 }
 
-typedef void *  __attribute__((const))
+typedef void * ATTRIBUTE(const)
   (*bar_t)(int);
 extern bar_t bar2;
 void * foo2(void);
@@ -8914,7 +8770,10 @@ printf %s "checking if $CC supports the pure function attribute... " >&6; }
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((pure))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(pure)
   bar(int);
 void * foo(void);
 void * foo(void)
@@ -8948,7 +8807,10 @@ printf %s "checking if $CC supports the pure function attribute on pointers... "
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((pure))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(pure)
   (*bar1)(int);
 void * foo1(void);
 void * foo1(void)
@@ -8957,7 +8819,7 @@ void * foo1(void)
 		bar1(1);
 }
 
-typedef void *  __attribute__((pure))
+typedef void * ATTRIBUTE(pure)
   (*bar_t)(int);
 extern bar_t bar2;
 void * foo2(void);
@@ -8992,7 +8854,10 @@ printf %s "checking if $CC supports the cold function attribute... " >&6; }
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((cold))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(cold)
   bar(int);
 void * foo(void);
 void * foo(void)
@@ -9026,7 +8891,10 @@ printf %s "checking if $CC supports the cold function attribute on pointers... "
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((cold))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(cold)
   (*bar1)(int);
 void * foo1(void);
 void * foo1(void)
@@ -9035,7 +8903,7 @@ void * foo1(void)
 		bar1(1);
 }
 
-typedef void *  __attribute__((cold))
+typedef void * ATTRIBUTE(cold)
   (*bar_t)(int);
 extern bar_t bar2;
 void * foo2(void);
@@ -9070,7 +8938,10 @@ printf %s "checking if $CC supports the unused function attribute... " >&6; }
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((unused))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(unused)
   bar(int);
 void * foo(void);
 void * foo(void)
@@ -9104,7 +8975,10 @@ printf %s "checking if $CC supports the unused function attribute on pointers...
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void *  __attribute__((unused))
+#include "autoconf/attribute.h"
+
+
+extern void * ATTRIBUTE(unused)
   (*bar1)(int);
 void * foo1(void);
 void * foo1(void)
@@ -9113,7 +8987,7 @@ void * foo1(void)
 		bar1(1);
 }
 
-typedef void *  __attribute__((unused))
+typedef void * ATTRIBUTE(unused)
   (*bar_t)(int);
 extern bar_t bar2;
 void * foo2(void);
@@ -9138,13 +9012,16 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC supports the error function attribute" >&5
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC supports the error function attribute" >&5
 printf %s "checking if $CC supports the error function attribute... " >&6; }
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 $ac_includes_default
-extern void __attribute__((error("message"))) barf(void);
+#include "autoconf/attribute.h"
+
+
+extern ATTRIBUTE(error("message")) void barf(void);
 void foo(void);
 void foo(void)
 {
@@ -9169,10 +9046,10 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 
 
 
- # Check whether --enable-sections was given.
-if test ${enable_sections+y}
+ # Check whether --enable-gc was given.
+if test ${enable_gc+y}
 then :
-  enableval=$enable_sections; pa_arg_bool_enableval="$enableval"
+  enableval=$enable_gc; pa_arg_bool_enableval="$enableval"
 else $as_nop
   pa_arg_bool_enableval="yes"
 fi
@@ -9180,6 +9057,72 @@ fi
 
  if test x"$pa_arg_bool_enableval" != xno
 then :
+
+
+
+
+
+  _PA_ADD_FLAGS_LDFLAGS_orig=$LDFLAGS
+  LDFLAGS="$LDFLAGS -Wl,--as-needed"
+  _PA_ADD_FLAGS_LDFLAGS_ok=yes
+
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+if test "x$_PA_ADD_FLAGS_LDFLAGS_ok" = xyes
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -Wl,--as-needed" >&5
+printf %s "checking if $CC accepts -Wl,--as-needed... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+int
+main (void)
+{
+FILE *f = fopen ("conftest.out", "w");
+ return ferror (f) || fclose (f) != 0;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+else $as_nop
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+       _PA_ADD_FLAGS_LDFLAGS_ok=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+     ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+ if test "x$_PA_ADD_FLAGS_LDFLAGS_ok" = xyes
+then :
+
+
+printf "%s\n" "#define LDFLAGS_WL_AS_NEEDED 1" >>confdefs.h
+
+
+else $as_nop
+  LDFLAGS="$_PA_ADD_FLAGS_LDFLAGS_orig"
+
+fi
+
+
+
+
+
 
 
 
@@ -9378,7 +9321,6 @@ fi
 
 
 
-
 fi
 
 
@@ -9396,73 +9338,8 @@ fi
  if test x"$pa_arg_bool_enableval" != xno
 then :
 
-
-
-
-
-  _PA_ADD_FLAGS_CFLAGS_orig=$CFLAGS
-  CFLAGS="$CFLAGS -flto"
-  _PA_ADD_FLAGS_CFLAGS_ok=yes
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if $CC accepts -flto" >&5
-printf %s "checking if $CC accepts -flto... " >&6; }
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdio.h>
-int
-main (void)
-{
-FILE *f = fopen ("conftest.out", "w");
- return ferror (f) || fclose (f) != 0;
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-       _PA_ADD_FLAGS_CFLAGS_ok=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-     ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
- if test "x$_PA_ADD_FLAGS_CFLAGS_ok" = xyes
-then :
-
-
-printf "%s\n" "#define CFLAGS_FLTO 1" >>confdefs.h
-
-
-else $as_nop
-  CFLAGS="$_PA_ADD_FLAGS_CFLAGS_orig"
-
-fi
-
-
-
-
-
-      ccbase=`echo "$CC" | awk '{ print $1; }'`
-  for ac_prog in ${ccbase}-ar
+   ccbase=`echo "$CC" | awk '{ print ; }'`
+   for ac_prog in ${ccbase}-ar
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -9510,8 +9387,8 @@ fi
 done
 test -n "$CC_AR" || CC_AR="$ac_cv_prog_AR"
 
-  AR="$CC_AR"
-  for ac_prog in ${ccbase}-ranlib
+   AR="$CC_AR"
+   for ac_prog in ${ccbase}-ranlib
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -9559,7 +9436,7 @@ fi
 done
 test -n "$CC_RANLIB" || CC_RANLIB="$ac_cv_prog_RANLIB"
 
-  RANLIB="$CC_RANLIB"
+   RANLIB="$CC_RANLIB"
 fi
 
 
@@ -11823,23 +11700,6 @@ printf "%s\n" "#define typeof $pa_cv_typeof" >>confdefs.h
 
 fi
 fi
-
-
-
- # Check whether --enable-ccache was given.
-if test ${enable_ccache+y}
-then :
-  enableval=$enable_ccache; pa_arg_bool_enableval="$enableval"
-else $as_nop
-  pa_arg_bool_enableval="no"
-fi
-
-
- if test x"$pa_arg_bool_enableval" != xno
-then :
-  CC="ccache $CC"
-fi
-
 
 ac_config_files="$ac_config_files Makefile doc/Makefile"
 
