@@ -55,6 +55,7 @@
 #define _MBCS 1
 
 #ifdef HAVE_CONFIG_H
+# include "autoconf/attribute.h"
 # include "config/config.h"
 #else
 # if defined(_MSC_VER) && (_MSC_VER >= 1310)
