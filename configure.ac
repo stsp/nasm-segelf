@@ -255,8 +255,8 @@ dnl Check for supported gcc attributes; some compilers (e.g. Sun CC)
 dnl support these, but don't define __GNUC__ as they don't support
 dnl some other features of gcc.
 dnl
-PA_ADD_CFLAGS([-Werror=attributes])
-PA_COMMON_ATTRIBUTES
+#PA_ADD_CFLAGS([-Werror=attributes])
+#PA_COMMON_ATTRIBUTES
 
 dnl
 dnl support function sections (if available)
