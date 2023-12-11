@@ -547,6 +547,7 @@ cleandeps: $(PERLREQ) $(tools)/syncfiles.pl $(tools)/mkdep.pl
 	fi
 
 deb: debian
+	git clean -fd
 	debuild -i -us -uc -b
 
 rpm: nasm.spec.rpkg
