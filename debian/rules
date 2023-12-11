@@ -9,7 +9,7 @@ include /usr/share/dpkg/buildflags.mk
 CFLAGS += $(CPPFLAGS)
 
 %:
-	dh $@
+	dh $@ --parallel --builddirectory=build
 
 override_dh_autoreconf:
 
