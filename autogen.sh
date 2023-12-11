@@ -14,25 +14,25 @@ AUTOMAKE="${AUTOMAKE:-${AUTOTOOLS_PREFIX}automake}"
 ACLOCAL="${ACLOCAL:-${AUTOTOOLS_PREFIX}aclocal}"
 AUTOHEADER="${AUTOHEADER:-${AUTOTOOLS_PREFIX}autoheader}"
 
-mkdir -p autoconf autoconf/helpers config
-autolib="`"$AUTOMAKE" --print-libdir`"
-if test ! x"$autolib" = x; then
-    for prg in install-sh compile config.guess config.sub; do
+#mkdir -p autoconf autoconf/helpers config
+#autolib="`"$AUTOMAKE" --print-libdir`"
+#if test ! x"$autolib" = x; then
+#    for prg in install-sh compile config.guess config.sub; do
 	# Update autoconf helpers if and only if newer ones are available
-	if test -f "$autolib"/"$prg" && \
-		( set -e ; \
-		  test -f autoconf/helpers/"$prg" && sed -n \
-		    -e 's/^scriptver=/scriptversion=/' \
-		    -e 's/^timestamp=/scriptversion=/' \
-		    -e 's/^scriptversion=['\''"]?\([^'\''"]*\).*$/\1/p' \
-			  "$autolib"/"$prg" autoconf/helpers/"$prg" | \
-			  sort -c 2>/dev/null ; \
-		  test $? -ne 0 )
-	then
-	    cp -f "$autolib"/"$prg" autoconf/helpers
-	fi
-    done
-fi
+#	if test -f "$autolib"/"$prg" && \
+#		( set -e ; \
+#		  test -f autoconf/helpers/"$prg" && sed -n \
+#		    -e 's/^scriptver=/scriptversion=/' \
+#		    -e 's/^timestamp=/scriptversion=/' \
+#		    -e 's/^scriptversion=['\''"]?\([^'\''"]*\).*$/\1/p' \
+#			  "$autolib"/"$prg" autoconf/helpers/"$prg" | \
+#			  sort -c 2>/dev/null ; \
+#		  test $? -ne 0 )
+#	then
+#	    cp -f "$autolib"/"$prg" autoconf/helpers
+#	fi
+#    done
+#fi
 #mv -f autoconf/aclocal.m4 autoconf/aclocal.m4.old
 #mkdir -p autoconf/m4.old autoconf/m4
 #mv -f autoconf/m4/*.m4 autoconf/m4.old/ 2>/dev/null || true
