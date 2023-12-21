@@ -487,8 +487,8 @@ config.status: configure
 	fi
 	sh config.status --recheck
 
-Makefile: config.status Makefile.in doc/Makefile.in
-	sh config.status
+#Makefile: config.status Makefile.in doc/Makefile.in
+#	sh config.status
 
 doc/Makefile: Makefile
 
