@@ -477,8 +477,8 @@ travis: $(PROGS)
 #
 # Rules to run autogen if necessary
 #
-configure: configure.ac autoconf/aclocal.m4
-	sh autogen.sh --recheck
+#configure: configure.ac autoconf/aclocal.m4
+#	sh autogen.sh --recheck
 
 config.status: configure
 	@if [ ! -f config.status ]; then \
