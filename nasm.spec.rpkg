@@ -22,7 +22,7 @@ instruction mnemonics and syntax.
 
 %build
 %configure --enable-sections
-make %{?_smp_mflags}
+make
 
 %install
 rm -rf "%{buildroot}"
