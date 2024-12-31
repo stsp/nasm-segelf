@@ -1,3 +1,9 @@
+nasm-segelf (2.16.01-3) noble; urgency=medium
+
+  * 2.16.01-3
+
+ -- stsp <stsp2@yandex.ru>  Tue, 31 Dec 2024 13:30:00 +0300
+
 nasm (2.16.01-2) mantic; urgency=medium
 
   * Segelf patches
