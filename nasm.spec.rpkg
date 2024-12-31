@@ -5,32 +5,24 @@ Release: 0%{?dist}
 VCS: {{{ git_dir_vcs }}}
 License: BSD
 Source0: {{{ git_dir_archive }}}
-URL: https://github.com/stsp/nasm
-BuildRoot: /tmp/rpm-build-nasm
-Prefix: %{_prefix}
+URL: https://github.com/stsp/nasm-segelf
 BuildRequires: perl
 BuildRequires: gcc
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
-NASM is the Netwide Assembler, a free portable assembler for the Intel
-80x86 microprocessor series, using primarily the traditional Intel
-instruction mnemonics and syntax.
+Netwide Assembler fork with realmode segments support for ELF target.
 
 %prep
 {{{ git_dir_setup_macro }}}
 
 %build
-%configure --enable-sections
+%configure
 make
 
 %install
-rm -rf "%{buildroot}"
-mkdir -p "%{buildroot}"/%{_bindir}
 make DESTDIR="%{buildroot}" install
 
 %files
-%doc AUTHORS
 %{_bindir}/nasm-segelf
 
 # This is the upstream spec file; the change log is in git
