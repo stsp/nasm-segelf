@@ -282,38 +282,21 @@ x86/regs.h: x86/regs.dat x86/regs.pl | x86
 # Extract warnings from source code. This is done automatically if any
 # C files have changed; the script is fast enough that that is
 # reasonable, but doesn't update the time stamp if the files aren't
-# changed, to avoid rebuilding everything every time. Track the actual
-# dependency by the empty file asm/warnings.time.
+# changed, to avoid rebuilding everything every time.
 WARNFILES = asm/warnings_c.h include/warnings.h doc/warnings.src
 
 warnings:
-	$(RM_F) $(WARNFILES) $(WARNFILES:=.time)
-	$(MAKE) asm/warnings.time
+	$(RM_F) $(WARNFILES)
+	$(MAKE) $(WARNFILES)
 
-asm/warnings.time: $(ALLOBJ_NW:.$(O)=.c) | asm
-	: > asm/warnings.time
-	$(MAKE) $(WARNFILES:=.time)
-
-asm/warnings_c.h.time: asm/warnings.pl asm/warnings.time | asm
+asm/warnings_c.h: asm/warnings.pl | asm
 	$(RUNPERL) $(srcdir)/asm/warnings.pl c asm/warnings_c.h $(srcdir)
-	: > asm/warnings_c.h.time
 
-asm/warnings_c.h: asm/warnings_c.h.time | asm
-	touch $@
-
-include/warnings.h.time: asm/warnings.pl asm/warnings.time | include
+include/warnings.h: asm/warnings.pl | include
 	$(RUNPERL) $(srcdir)/asm/warnings.pl h include/warnings.h $(srcdir)
-	: > include/warnings.h.time
 
-include/warnings.h: include/warnings.h.time | include
-	touch $@
-
-doc/warnings.src.time: asm/warnings.pl asm/warnings.time
+doc/warnings.src: asm/warnings.pl
 	$(RUNPERL) $(srcdir)/asm/warnings.pl doc doc/warnings.src $(srcdir)
-	: > doc/warnings.src.time
-
-doc/warnings.src : doc/warnings.src.time
-	touch $@
 
 # Assembler token hash
 asm/tokhash.c: x86/insns.dat x86/insnsn.c asm/tokens.dat asm/tokhash.pl \
