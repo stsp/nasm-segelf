@@ -53,7 +53,7 @@
 # define curdir "."
 #elif defined(unix) || defined(__unix) || defined(__unix__) ||   \
     defined(__UNIX__) || defined(__Unix__) || \
-    defined(__MACH__) || defined(__BEOS__)
+    defined(__MACH__) || defined(__BEOS__) || defined(__HAIKU__)
 /* Unix and Unix-like operating systems and others using
  * the equivalent syntax (slashes as only separators, no concept of volume)
  *
