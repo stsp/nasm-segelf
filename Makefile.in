@@ -26,12 +26,12 @@ CC		= @CC@
 CFLAGS		= @CFLAGS@
 CPPFLAGS	= @CPPFLAGS@
 BUILD_CFLAGS	= $(CPPFLAGS) $(CFLAGS) @DEFS@
-INTERNAL_CFLAGS = -I$(srcdir) -I$(objdir) \
-		  -I$(srcdir)/include -I$(objdir)/include \
-		  -I$(srcdir)/x86 -I$(objdir)/x86 \
-		  -I$(srcdir)/asm -I$(objdir)/asm \
-		  -I$(srcdir)/disasm -I$(objdir)/disasm \
-		  -I$(srcdir)/output -I$(objdir)/output
+INTERNAL_CFLAGS = -iquote$(srcdir) -iquote$(objdir) \
+		  -iquote$(srcdir)/include -iquote$(objdir)/include \
+		  -iquote$(srcdir)/x86 -iquote$(objdir)/x86 \
+		  -iquote$(srcdir)/asm -iquote$(objdir)/asm \
+		  -iquote$(srcdir)/disasm -iquote$(objdir)/disasm \
+		  -iquote$(srcdir)/output -iquote$(objdir)/output
 ALL_CFLAGS	= $(BUILD_CFLAGS) $(INTERNAL_CFLAGS)
 LDFLAGS		= @LDFLAGS@
 ALL_LDFLAGS     = $(ALL_CFLAGS) $(LDFLAGS)
