@@ -1,3 +1,9 @@
+nasm-segelf (2.16.01-4) noble; urgency=medium
+
+  * 2.16.01-4
+
+ -- stsp <stsp2@yandex.ru>  Wed, 9 Jul 2025 11:30:00 +0300
+
 nasm-segelf (2.16.01-3) noble; urgency=medium
 
   * 2.16.01-3
